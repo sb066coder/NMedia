@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">NMedia</string>
     <string name="nmedia">NMedia!</string>
-    <string name="author_avatar">Author avatar</string>
-    <string name="menu_button">Menu button</string>
-    <string name="post_likes">Likes</string>
-    <string name="post_shares">Shares</string>
-    <string name="post_watched">Watched</string>
+    <string name="author_avatar" translatable="false">Author avatar</string>
+    <string name="menu_button" translatable="false">Menu button</string>
+    <string name="post_likes" translatable="false">Likes</string>
+    <string name="post_shares" translatable="false">Shares</string>
+    <string name="post_watched" translatable="false">Watched</string>
 </resources>
