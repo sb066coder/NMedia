@@ -83,7 +83,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/secondBarrier"
         android:layout_margin="@dimen/common_space"
-        app:srcCompat="@drawable/heart"
+        app:srcCompat="@drawable/ic_heart_grey"
         android:background="@android:color/transparent"
         android:contentDescription="@string/post_likes" />
 
@@ -105,9 +105,7 @@
         app:layout_constraintTop_toBottomOf="@id/secondBarrier"
         android:layout_margin="@dimen/common_space"
         android:background="@android:color/transparent"
-        app:srcCompat="@drawable/share"
-        tools:layout_editor_absoluteX="117dp"
-        tools:layout_editor_absoluteY="387dp"
+        app:srcCompat="@drawable/ic_share"
         android:contentDescription="@string/post_shares" />
 
     <TextView
@@ -127,9 +125,7 @@
         app:layout_constraintEnd_toStartOf="@id/tvWatched"
         app:layout_constraintTop_toBottomOf="@id/secondBarrier"
         android:layout_margin="@dimen/common_space"
-        app:srcCompat="@drawable/eye"
-        tools:layout_editor_absoluteX="245dp"
-        tools:layout_editor_absoluteY="363dp"
+        app:srcCompat="@drawable/ic_eye"
         android:contentDescription="@string/post_watched" />
 
     <TextView
@@ -147,7 +143,7 @@
         android:layout_height="3dp"
         android:layout_margin="@dimen/common_space"
         app:layout_constraintTop_toBottomOf="@id/ivLikes"
-        android:background="#C84A2A"/>
+        android:background="@color/brick_red"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
