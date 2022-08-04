@@ -39,6 +39,7 @@ dependencies {
     def lifecycle_version = "2.5.0"
     def arch_version = "2.1.0"
 
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
     implementation 'androidx.fragment:fragment-ktx:1.5.0'
     implementation "androidx.arch.core:core-testing:$arch_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
