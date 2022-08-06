@@ -6,4 +6,11 @@
     <string name="post_likes" translatable="false">Likes</string>
     <string name="post_shares" translatable="false">Shares</string>
     <string name="post_watched" translatable="false">Watched</string>
+    <string name="menu_remove">Remove</string>
+    <string name="post_text">Post text</string>
+    <string name="error_empty_content">Text cannot be empty</string>
+    <string name="menu_edit">Edit</string>
+    <string name="edit_post">Edit post</string>
+    <string name="floppy_disk" translatable="false">Floppy disk</string>
+    <string name="cancel_cross" translatable="false">Cancel cross</string>
 </resources>
