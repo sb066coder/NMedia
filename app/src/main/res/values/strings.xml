@@ -13,4 +13,5 @@
     <string name="edit_post">Edit post</string>
     <string name="floppy_disk" translatable="false">Floppy disk</string>
     <string name="cancel_cross" translatable="false">Cancel cross</string>
+    <string name="description_post_like">Button to like post</string>
 </resources>

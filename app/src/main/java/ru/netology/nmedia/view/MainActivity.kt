@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        binding.rvList.adapter = adapter // Адаптер передается ресайклеру
+        binding.rvList.adapter = adapter
 
         viewModel.edited.observe(this) { post ->
             if (post.id == 0L) {

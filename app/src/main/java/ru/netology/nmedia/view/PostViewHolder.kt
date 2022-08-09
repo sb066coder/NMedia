@@ -13,18 +13,18 @@ class PostViewHolder(
 
     fun bind(post: Post) {
         binding.apply {
-            // Заполнение лэйаута данными из поста
             tvAuthor.text = post.author
             tvPublished.text = post.published
             tvContent.text = post.content
-            ivLike.setImageResource(if (post.likedByMe) R.drawable.ic_heart_red else R.drawable.ic_heart_grey)
-            ivLike.setOnClickListener { onInteractionListener.onLike(post) }
-            ivShare.setOnClickListener { onInteractionListener.onShare(post) }
-            tvLikes.text = formattedNumber(post.likes)
-            tvShared.text = formattedNumber(post.shares)
-            tvWatched.text = formattedNumber(post.watches)
+            mbLike.isChecked = post.likedByMe
+            mbLike.setIconResource(R.drawable.ic_like_select)
+            mbLike.setOnClickListener { onInteractionListener.onLike(post) }
+            mbShare.setOnClickListener { onInteractionListener.onShare(post) }
+            mbLike.text = formattedNumber(post.likes)
+            mbShare.text = formattedNumber(post.shares)
+            mbWatch.text = formattedNumber(post.watches)
 
-            ibMenu.setOnClickListener {
+            mbMenu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
                     setOnMenuItemClickListener { item ->

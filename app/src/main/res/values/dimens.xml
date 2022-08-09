@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="common_space">16dp</dimen>
+    <dimen name="common_space_mod_2">16dp</dimen>
+    <dimen name="mod_1">8dp</dimen>
     <dimen name="avatar_size">48dp</dimen>
     <dimen name="post_attribute_size">24dp</dimen>
 </resources>
