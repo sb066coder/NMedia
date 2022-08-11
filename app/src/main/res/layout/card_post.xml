@@ -10,7 +10,7 @@
         android:id="@+id/avatar"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
-        android:layout_margin="@dimen/common_space"
+        android:layout_margin="@dimen/common_space_mod_2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/firstBarrier"
@@ -26,9 +26,9 @@
         app:layout_constraintTop_toTopOf="@id/avatar"
         app:layout_constraintBottom_toTopOf="@id/tvPublished"
         app:layout_constraintStart_toEndOf="@id/avatar"
-        app:layout_constraintEnd_toStartOf="@id/ibMenu"
-        android:layout_marginStart="@dimen/common_space"
-        android:layout_marginEnd="@dimen/common_space"
+        app:layout_constraintEnd_toStartOf="@id/mbMenu"
+        android:layout_marginStart="@dimen/common_space_mod_2"
+        android:layout_marginEnd="@dimen/common_space_mod_2"
         tools:text="@sample/posts.json/data/author"/>
 
     <TextView
@@ -38,26 +38,31 @@
         app:layout_constraintTop_toBottomOf="@id/tvAuthor"
         app:layout_constraintBottom_toBottomOf="@id/avatar"
         app:layout_constraintStart_toEndOf="@id/avatar"
-        android:layout_marginStart="@dimen/common_space"
+        android:layout_marginStart="@dimen/common_space_mod_2"
         tools:text="@sample/posts.json/data/published"/>
 
-    <ImageButton
-        android:id="@+id/ibMenu"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mbMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_more_vert_24"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="@dimen/common_space_mod_2"
+        android:contentDescription="@string/menu_button"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="@dimen/common_space"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/menu_button" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:icon="@drawable/ic_more_vert_24"
+        style="@style/Widget.MaterialComponents.Button.TextButton.Icon"/>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/firstBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="avatar, tvPublished, ibMenu"/>
+        app:constraint_referenced_ids="avatar, tvPublished, mbMenu"
+        tools:layout_editor_absoluteY="80dp" />
 
     <TextView
         android:id="@+id/tvContent"
@@ -65,7 +70,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/firstBarrier"
         app:layout_constraintBottom_toTopOf="@id/secondBarrier"
-        android:layout_margin="@dimen/common_space"
+        android:layout_margin="@dimen/common_space_mod_2"
         tools:text="@sample/posts.json/data/content"
         android:autoLink="web"/>
 
@@ -74,75 +79,57 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="tvContent"/>
+        app:constraint_referenced_ids="tvContent"
+        tools:layout_editor_absoluteY="281dp" />
 
-    <ImageView
-        android:id="@+id/ivLike"
-        android:layout_width="@dimen/post_attribute_size"
-        android:layout_height="@dimen/post_attribute_size"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mbLike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checkable="true"
+        android:contentDescription="@string/description_post_like"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/secondBarrier"
-        android:layout_margin="@dimen/common_space"
-        app:srcCompat="@drawable/ic_heart_grey"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/post_likes" />
-
-    <TextView
-        android:id="@+id/tvLikes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/common_space"
+        app:icon="@drawable/ic_like_select"
+        app:iconTint="@color/like_checkbox_tint"
+        tools:checked="true"
         tools:text="@sample/posts.json/data/likes"
-        app:layout_constraintTop_toTopOf="@id/ivLike"
-        app:layout_constraintBottom_toBottomOf="@id/ivLike"
-        app:layout_constraintStart_toEndOf="@id/ivLike"/>
+        style="@style/Widget.AppTheme.LikeButton"
+        android:layout_marginStart="@dimen/common_space_mod_2"
+        app:iconSize="24dp"/>
 
-    <ImageView
-        android:id="@+id/ivShare"
-        android:layout_width="@dimen/post_attribute_size"
-        android:layout_height="@dimen/post_attribute_size"
-        app:layout_constraintStart_toEndOf="@id/tvLikes"
-        app:layout_constraintTop_toBottomOf="@id/secondBarrier"
-        android:layout_margin="@dimen/common_space"
-        android:background="@android:color/transparent"
-        app:srcCompat="@drawable/ic_share"
-        android:contentDescription="@string/post_shares" />
-
-    <TextView
-        android:id="@+id/tvShared"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mbShare"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/common_space"
+        android:contentDescription="@string/description_post_like"
+        app:layout_constraintStart_toEndOf="@id/mbLike"
+        app:layout_constraintTop_toBottomOf="@id/secondBarrier"
+        app:icon="@drawable/ic_share"
+        tools:checked="true"
         tools:text="@sample/posts.json/data/shared"
-        app:layout_constraintTop_toTopOf="@id/ivLike"
-        app:layout_constraintBottom_toBottomOf="@id/ivLike"
-        app:layout_constraintStart_toEndOf="@id/ivShare"/>
+        style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+        android:layout_marginStart="@dimen/mod_1"
+        app:iconSize="24dp"/>
 
-    <ImageView
-        android:id="@+id/ivWatched"
-        android:layout_width="@dimen/post_attribute_size"
-        android:layout_height="@dimen/post_attribute_size"
-        app:layout_constraintEnd_toStartOf="@id/tvWatched"
-        app:layout_constraintTop_toBottomOf="@id/secondBarrier"
-        android:layout_margin="@dimen/common_space"
-        app:srcCompat="@drawable/ic_eye"
-        android:contentDescription="@string/post_watched" />
-
-    <TextView
-        android:id="@+id/tvWatched"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mbWatch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/common_space"
+        android:contentDescription="@string/description_post_like"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/secondBarrier"
+        app:icon="@drawable/ic_eye"
+        android:clickable="false"
         tools:text="@sample/posts.json/data/watched"
-        app:layout_constraintTop_toTopOf="@id/ivLike"
-        app:layout_constraintBottom_toBottomOf="@id/ivLike"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+        android:layout_marginEnd="@dimen/mod_1"
+        app:iconSize="24dp"/>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:layout_margin="@dimen/common_space"
-        app:layout_constraintTop_toBottomOf="@id/ivLike"
+        app:layout_constraintTop_toBottomOf="@id/mbLike"
         android:background="@color/brick_red"/>
 
 
