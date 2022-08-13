@@ -1,6 +1,5 @@
 package ru.netology.nmedia.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.netology.nmedia.model.Post

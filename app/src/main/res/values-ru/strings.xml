@@ -8,4 +8,8 @@
     <string name="menu_edit">Редактировать</string>
     <string name="edit_post">Редактирование поста</string>
     <string name="description_post_like">Button to like post</string>
+    <string name="chooser_share_post">Поделиться постом</string>
+    <string name="add_post">Добавить пост</string>
+    <string name="incoming_text_n">Принятый текст\n</string>
+    <string name="video_content">Video content</string>
 </resources>

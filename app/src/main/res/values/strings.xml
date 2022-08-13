@@ -14,4 +14,8 @@
     <string name="floppy_disk" translatable="false">Floppy disk</string>
     <string name="cancel_cross" translatable="false">Cancel cross</string>
     <string name="description_post_like">Button to like post</string>
+    <string name="chooser_share_post">Share post</string>
+    <string name="add_post">Add post</string>
+    <string name="incoming_text_n">Incoming text\n</string>
+    <string name="video_content">Video content</string>
 </resources>
