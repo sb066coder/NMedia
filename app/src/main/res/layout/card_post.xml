@@ -64,11 +64,24 @@
         app:constraint_referenced_ids="avatar, tvPublished, mbMenu"
         tools:layout_editor_absoluteY="80dp" />
 
+    <ImageView
+        android:id="@+id/ivVideoContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/common_space_mod_2"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toTopOf="@id/tvContent"
+        app:layout_constraintTop_toBottomOf="@id/firstBarrier"
+        app:srcCompat="@drawable/video_content_dummy"
+        tools:visibility="visible"
+        android:visibility="gone"
+        android:contentDescription="@string/video_content" />
+
     <TextView
         android:id="@+id/tvContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/firstBarrier"
+        app:layout_constraintTop_toBottomOf="@id/ivVideoContent"
         app:layout_constraintBottom_toTopOf="@id/secondBarrier"
         android:layout_margin="@dimen/common_space_mod_2"
         tools:text="@sample/posts.json/data/content"

@@ -1,5 +1,6 @@
 package ru.netology.nmedia.view
 
+import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
@@ -17,7 +18,6 @@ class PostViewHolder(
             tvPublished.text = post.published
             tvContent.text = post.content
             mbLike.isChecked = post.likedByMe
-            mbLike.setIconResource(R.drawable.ic_like_select)
             mbLike.setOnClickListener { onInteractionListener.onLike(post) }
             mbShare.setOnClickListener { onInteractionListener.onShare(post) }
             mbLike.text = formattedNumber(post.likes)
@@ -42,6 +42,8 @@ class PostViewHolder(
                     }
                 }.show()
             }
+            ivVideoContent.visibility = if (post.videoContent != null)  View.VISIBLE else View.GONE
+            ivVideoContent.setOnClickListener { onInteractionListener.onViewVideo(post) }
         }
     }
 
