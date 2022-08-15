@@ -1,10 +1,10 @@
 package ru.netology.nmedia.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.netology.nmedia.model.Post
-import ru.netology.nmedia.model.PostRepository
-import ru.netology.nmedia.model.PostRepositoryInMemoryImpl
+import ru.netology.nmedia.model.*
 
 private val empty = Post(
     id = 0,
@@ -17,12 +17,11 @@ private val empty = Post(
     likedByMe = false
 )
 
-class PostViewModel: ViewModel() {
+class PostViewModel(application: Application): AndroidViewModel(application) {
     //Создание репозитория
-    private val repository: PostRepository = PostRepositoryInMemoryImpl()
-    // Поле data получает ссылку на data репозитория. За следит activity
+    private val repository: PostRepository = PostRepositoryFileImpl(application)
     val data = repository.getAll()
-    val edited = MutableLiveData(empty)
+    private val edited = MutableLiveData(empty)
 
     fun save() {
         edited.value?.let {
@@ -48,7 +47,6 @@ class PostViewModel: ViewModel() {
     }
 
 
-    // Перенапрвление вызова функции лайк из activity в репозиторий
     fun likeById(id: Long) {
         repository.likeById(id)
     }

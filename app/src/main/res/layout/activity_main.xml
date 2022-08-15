@@ -11,9 +11,10 @@
         android:id="@+id/rvList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/card_post"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="35dp"
+        tools:listitem="@layout/card_post" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
