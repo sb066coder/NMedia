@@ -1,6 +1,7 @@
 package ru.netology.nmedia.model
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
@@ -22,6 +23,10 @@ class PostRepositoryFileImpl(private val context: Context) : PostRepository {
                 posts = gson.fromJson(it, type)
                 data.value = posts
             }
+            posts.forEach {
+                nextId = maxOf(it.id, nextId)
+            }
+            nextId++
         } else {
             sync()
         }
@@ -69,6 +74,7 @@ class PostRepositoryFileImpl(private val context: Context) : PostRepository {
             ) + posts
             data.value = posts
             sync()
+            //Log.i("AAA", "Post ${posts.first().id} added")
             return
         }
         posts = posts.map {
@@ -76,6 +82,7 @@ class PostRepositoryFileImpl(private val context: Context) : PostRepository {
         }
         data.value = posts
         sync()
+        //Log.i("AAA", "Post ${post.id} edited")
     }
 
     private fun sync() {
