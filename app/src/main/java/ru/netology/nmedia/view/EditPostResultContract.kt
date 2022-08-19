@@ -8,7 +8,7 @@ import androidx.activity.result.contract.ActivityResultContract
 class EditPostResultContract : ActivityResultContract<String, String?>() {
 
     override fun createIntent(context: Context, input: String): Intent {
-        return Intent(context, EditPostActivity::class.java).apply {
+        return Intent(context, EditPostFragment::class.java).apply {
             putExtra(Intent.EXTRA_TEXT, input)
         }
     }

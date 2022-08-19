@@ -1,33 +1,39 @@
 package ru.netology.nmedia.view
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
-import androidx.activity.result.launch
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
-import ru.netology.nmedia.databinding.ActivityMainBinding
+import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.view.EditPostFragment.Companion.textArg
 import ru.netology.nmedia.viewmodel.PostViewModel
-import ru.netology.nmedia.util.AndroidUtils
 
-class MainActivity : AppCompatActivity() {
+class FeedFragment : Fragment() {
 
+    val viewModel: PostViewModel by viewModels(
+        ownerProducer = ::requireParentFragment
+    )
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         // Создание объекта binding с наполнением из activity_main
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        val binding = FragmentFeedBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+//        setContentView(binding.root)
 
-        // Создание объекта PostViewModel
-        val viewModel: PostViewModel by viewModels()
 
         // Создание контракта
         val editPostActivity = registerForActivityResult(EditPostResultContract()) { result ->
@@ -56,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 override fun onEdit(post: Post) {
                     viewModel.edit(post)
-                    editPostActivity.launch(post.content)
+                    findNavController().navigate(R.id.action_feedFragment_to_editPostFragment)
                 }
 
                 override fun onViewVideo(post: Post) {
@@ -68,12 +74,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.rvList.adapter = adapter
 
-        viewModel.data.observe(this) { posts ->
+        viewModel.data.observe(viewLifecycleOwner) { posts ->
             adapter.submitList(posts) //Адаптер принимает новый список posts и сравнивает с имеющимся для внесения изменений
         }
 
         binding.fabAdd.setOnClickListener {
-            editPostActivity.launch("")
+            findNavController().navigate(R.id.action_feedFragment_to_editPostFragment)
         }
+
+        return binding.root
     }
 }
