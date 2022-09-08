@@ -39,8 +39,10 @@ class OpenPostFragment : Fragment() {
         )
 
         viewModel.data.observe(viewLifecycleOwner) {
-            try {
-                val post: Post = viewModel.data.value!!.first { it.id == arguments?.numArg }
+            val post: Post? = viewModel.data.value!!.firstOrNull { it.id == arguments?.numArg }
+            if (post == null) {
+                findNavController().popBackStack()
+            } else {
 
                 binding.apply {
                     tvAuthor.text = post.author
@@ -52,7 +54,7 @@ class OpenPostFragment : Fragment() {
                     mbWatch.text = ViewUtils.formattedNumber(post.watches)
                     ivVideoContent.visibility =
                         if (post.videoContent != null) View.VISIBLE else View.GONE
-    //            fillInPostData(this)
+                    //            fillInPostData(this)
                     mbLike.setOnClickListener { viewModel.likeById(post.id) }
                     mbShare.setOnClickListener {
                         viewModel.shareById(post.id)
@@ -72,7 +74,6 @@ class OpenPostFragment : Fragment() {
                             setOnMenuItemClickListener { item ->
                                 when (item.itemId) {
                                     R.id.remove -> {
-                                        findNavController().popBackStack()
                                         viewModel.deleteById(post.id)
                                         true
                                     }
@@ -94,8 +95,6 @@ class OpenPostFragment : Fragment() {
                         startActivity(intent)
                     }
                 }
-            } catch (e: NoSuchElementException) {
-                findNavController().popBackStack()
             }
         }
         return binding.root
