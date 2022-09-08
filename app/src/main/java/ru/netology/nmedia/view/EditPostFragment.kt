@@ -9,15 +9,13 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.databinding.FragmentEditPostBinding
 import ru.netology.nmedia.util.AndroidUtils
+import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class EditPostFragment : Fragment() {
 
     companion object {
-        private const val TEXT_KEY = "TEXT_KEY"
-        var Bundle.textArg: String?
-            set(value) = putString(TEXT_KEY, value)
-            get() = getString(TEXT_KEY)
+        var Bundle.textArg: String? by StringArg
     }
 
     private val viewModel: PostViewModel by viewModels(
@@ -35,7 +33,7 @@ class EditPostFragment : Fragment() {
             false
         )
 
-        arguments?.textArg?.let(binding.etContent::setText)
+        arguments?.textArg.let( binding.etContent::setText )
 
         binding.fabPlus.setOnClickListener {
             viewModel.changeContent(binding.etContent.text.toString())

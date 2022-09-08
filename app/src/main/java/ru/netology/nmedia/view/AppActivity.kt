@@ -7,7 +7,7 @@ import androidx.navigation.findNavController
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
-import ru.netology.nmedia.view.EditPostFragment.Companion.textArg
+import ru.netology.nmedia.view.FeedFragment.Companion.textArg
 
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
     override fun onCreate(savedInstanceState: Bundle?) {

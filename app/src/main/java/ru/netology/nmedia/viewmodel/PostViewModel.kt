@@ -34,10 +34,6 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
         edited.value = post
     }
 
-    fun cancel() {
-        edited.value = empty
-    }
-
     fun changeContent(content: String) {
         val text = content.trim()
         if (edited.value?.content == text) {
@@ -45,7 +41,6 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
         }
         edited.value = edited.value?.copy(content = text)
     }
-
 
     fun likeById(id: Long) {
         repository.likeById(id)

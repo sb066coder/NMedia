@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.util.ViewUtils
 
 class PostViewHolder(
     private val binding: CardPostBinding,
@@ -20,9 +21,9 @@ class PostViewHolder(
             mbLike.isChecked = post.likedByMe
             mbLike.setOnClickListener { onInteractionListener.onLike(post) }
             mbShare.setOnClickListener { onInteractionListener.onShare(post) }
-            mbLike.text = formattedNumber(post.likes)
-            mbShare.text = formattedNumber(post.shares)
-            mbWatch.text = formattedNumber(post.watches)
+            mbLike.text = ViewUtils.formattedNumber(post.likes)
+            mbShare.text = ViewUtils.formattedNumber(post.shares)
+            mbWatch.text = ViewUtils.formattedNumber(post.watches)
 
             mbMenu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
@@ -44,16 +45,7 @@ class PostViewHolder(
             }
             ivVideoContent.visibility = if (post.videoContent != null)  View.VISIBLE else View.GONE
             ivVideoContent.setOnClickListener { onInteractionListener.onViewVideo(post) }
-        }
-    }
-
-    private fun formattedNumber(number: Int): String {
-        return when {
-            number < 1_000 -> number.toString()
-            number < 10_000 -> "${number / 1000}" + (if ((number / 100) % 10 > 0) ".${(number / 100) % 10}" else "") + " K"
-            number < 1_000_000 -> "${number / 1000} K"
-            number < 10_000_000 -> "${number / 1_000_000}" + (if ((number / 100_000) % 10 > 0) ".${(number / 100_000) % 10}" else "") + " M"
-            else -> "${number / 1_000_000} M"
+            root.setOnClickListener { onInteractionListener.onOpenPost(post) }
         }
     }
 }

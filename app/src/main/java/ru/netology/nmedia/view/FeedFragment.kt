@@ -12,10 +12,16 @@ import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.model.Post
-import ru.netology.nmedia.view.EditPostFragment.Companion.textArg
+import ru.netology.nmedia.util.StringArg
+import ru.netology.nmedia.util.LongArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
+
+    companion object {
+        var Bundle.textArg: String? by StringArg
+        var Bundle.numArg: Long by LongArg
+    }
 
     val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment
@@ -32,18 +38,6 @@ class FeedFragment : Fragment() {
             container,
             false
         )
-//        setContentView(binding.root)
-
-
-        // Создание контракта
-        val editPostActivity = registerForActivityResult(EditPostResultContract()) { result ->
-            if(result == null) {
-                viewModel.cancel()
-                return@registerForActivityResult
-            }
-            viewModel.changeContent(result)
-            viewModel.save()
-        }
 
         // Создание адаптера
         val adapter = PostsAdapter (
@@ -62,12 +56,20 @@ class FeedFragment : Fragment() {
                 }
                 override fun onEdit(post: Post) {
                     viewModel.edit(post)
-                    findNavController().navigate(R.id.action_feedFragment_to_editPostFragment)
+                    findNavController().navigate(
+                        R.id.action_feedFragment_to_editPostFragment,
+                        Bundle().apply { textArg = post.content }
+                    )
                 }
-
                 override fun onViewVideo(post: Post) {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.videoContent))
                     startActivity(intent)
+                }
+                override fun onOpenPost(post: Post) {
+                    findNavController().navigate(
+                        R.id.action_feedFragment_to_openPostFragment,
+                        Bundle().apply { numArg = post.id }
+                    )
                 }
             }
         )

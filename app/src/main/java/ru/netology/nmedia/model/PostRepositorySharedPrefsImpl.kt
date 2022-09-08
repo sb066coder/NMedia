@@ -13,7 +13,7 @@ class PostRepositorySharedPrefsImpl(context: Context) : PostRepository {
     private val prefs = context.getSharedPreferences("repo", Context.MODE_PRIVATE)
     private val type = TypeToken.getParameterized(List::class.java, Post::class.java).type
     private val key = "posts"
-    private var nextId = 1L // Решить проблему сохраниения id - сбрасывается при перезапуске приложения и добавляются посты с дуюлирующимися id
+    private var nextId = 1L
     private var posts = emptyList<Post>()
 
     private val data = MutableLiveData(posts)
@@ -71,7 +71,6 @@ class PostRepositorySharedPrefsImpl(context: Context) : PostRepository {
             ) + posts
             data.value = posts
             sync()
-            //Log.i("AAA", "Post ${posts.first().id} added")
             return
         }
         posts = posts.map {
@@ -79,7 +78,6 @@ class PostRepositorySharedPrefsImpl(context: Context) : PostRepository {
         }
         data.value = posts
         sync()
-        //Log.i("AAA", "Post ${post.id} edited")
     }
 
     private fun sync() {
