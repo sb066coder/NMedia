@@ -3,7 +3,7 @@ package ru.netology.nmedia.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.*
 
 private val empty = Post(
@@ -19,7 +19,9 @@ private val empty = Post(
 
 class PostViewModel(application: Application): AndroidViewModel(application) {
     //Создание репозитория
-    private val repository: PostRepository = PostRepositorySharedPrefsImpl(application)
+    private val repository: PostRepository = PostRepositorySQLiteImpl(
+        AppDb.getInstance(application).postDao
+    )
     val data = repository.getAll()
     private val edited = MutableLiveData(empty)
 

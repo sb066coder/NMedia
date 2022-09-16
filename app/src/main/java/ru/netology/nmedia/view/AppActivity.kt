@@ -29,19 +29,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                     textArg = text
                 }
             )
-//            if (text.isBlank()) {
-//                Snackbar.make(binding.root, R.string.error_empty_content,
-//                    BaseTransientBottomBar.LENGTH_INDEFINITE
-//                )
-//                    .setAction(android.R.string.ok) {
-//                        finish()
-//                    }
-//                    .show()
-//                return@let
-//            }
-//            with(binding.tvText) {
-//                this.text = this.text.toString().plus(text)
-//            }
         }
     }
 }
