@@ -14,7 +14,7 @@ import ru.netology.nmedia.databinding.FragmentEditPostBinding
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
-
+const val DRAFT_KEY = "draft"
 class EditPostFragment : Fragment() {
 
     companion object {
@@ -39,7 +39,7 @@ class EditPostFragment : Fragment() {
         val sPref = requireContext().getSharedPreferences("newPostContent", Context.MODE_PRIVATE)
 
         if (arguments == null) {
-            binding.etContent.setText(sPref.getString("draft", ""))
+            binding.etContent.setText(sPref.getString(DRAFT_KEY, ""))
         } else {
             arguments?.textArg.let( binding.etContent::setText )
         }
@@ -47,7 +47,7 @@ class EditPostFragment : Fragment() {
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 sPref.edit().apply {
-                        putString("draft", binding.etContent.text.toString())
+                        putString(DRAFT_KEY, binding.etContent.text.toString())
                         apply()
                     }
                 findNavController().navigateUp()
