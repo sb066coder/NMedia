@@ -1,7 +1,6 @@
 package ru.netology.nmedia.model
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson

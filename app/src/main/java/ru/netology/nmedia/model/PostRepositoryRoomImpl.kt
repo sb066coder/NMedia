@@ -1,7 +1,5 @@
 package ru.netology.nmedia.model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import ru.netology.nmedia.db.PostDao
 import ru.netology.nmedia.db.PostEntity
