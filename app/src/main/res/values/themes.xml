@@ -18,5 +18,5 @@
         <item name="iconTint">@color/like_checkbox_tint</item>
         <item name="android:textColor">@color/indigo_400</item>
         <item name="android:textSize">14sp</item>
-</style>
+    </style>
 </resources>

@@ -18,4 +18,7 @@
     <string name="add_post">Add post</string>
     <string name="incoming_text_n">Incoming text\n</string>
     <string name="video_content">Video content</string>
+    <string name="retry_text">Something went wrong. Try again later</string>
+    <string name="retry">Retry</string>
+    <string name="empty_posts_text">There are no posts.\nIf you create a new post, it will appear here</string>
 </resources>
