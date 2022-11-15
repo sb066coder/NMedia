@@ -39,7 +39,7 @@ class OpenPostFragment : Fragment() {
         )
 
         viewModel.data.observe(viewLifecycleOwner) {
-            val post: Post? = viewModel.data.value!!.firstOrNull { it.id == arguments?.numArg }
+            val post: Post? = viewModel.data.value!!.posts.firstOrNull { it.id == arguments?.numArg }
             if (post == null) {
                 findNavController().popBackStack()
             } else {
@@ -57,7 +57,7 @@ class OpenPostFragment : Fragment() {
                     //            fillInPostData(this)
                     mbLike.setOnClickListener { viewModel.likeById(post.id) }
                     mbShare.setOnClickListener {
-                        viewModel.shareById(post.id)
+//                        viewModel.shareById(post.id)
                         val intent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, post.content)
