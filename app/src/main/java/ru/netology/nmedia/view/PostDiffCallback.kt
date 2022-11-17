@@ -12,4 +12,7 @@ class PostDiffCallback : DiffUtil.ItemCallback<Post>(){
         return oldItem == newItem
     }
 
+    override fun getChangePayload(oldItem: Post, newItem: Post): Any? {
+        return if (oldItem.likedByMe != newItem.likedByMe) true else null
+    }
 }

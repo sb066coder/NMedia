@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.*
 import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.IOException
@@ -22,6 +21,8 @@ private val empty = Post(
 )
 
 class PostViewModel(application: Application): AndroidViewModel(application) {
+
+
     //Создание репозитория
     private val repository: PostRepository = PostRepositoryServerImpl()
     private val _data = MutableLiveData(FeedModel())
@@ -31,24 +32,30 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
+    private val _isRefreshing = MutableLiveData(false)
+    val isRefreshing: LiveData<Boolean>
+        get() = _isRefreshing
 
     init {
         loadPosts()
     }
 
-    fun loadPosts() {
-        thread { // Starts new thread
-            // Start loading
-            _data.postValue(FeedModel(loading = true))
-            try {
+    fun loadPosts(onRefresh: Boolean = false) {
+        // Start loading
+        _data.postValue(FeedModel(loading = !onRefresh))
+
+        repository.getAllAsync(object : PostRepository.GetAllCallback {
+            override fun onSuccess(posts: List<Post>) {
                 // if data got successfully
-                val posts = repository.getAll()
-                FeedModel(posts = posts, empty = posts.isEmpty())
-            } catch (e: IOException) {
+                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+                _isRefreshing.postValue(false)
+            }
+            override fun onError(e: Exception) {
                 // if error got
-                FeedModel(error = true)
-            }.also(_data::postValue)
-        }
+                _data.postValue(FeedModel(error = true))
+                _isRefreshing.postValue(false)
+            }
+        })
     }
 
     fun save() {
@@ -75,12 +82,22 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
 
     fun likeById(id: Long) {
         thread {
-            if (_data.value?.posts?.first { it.id == id }?.likedByMe == false) {
+            val updatedPost = if (_data.value?.posts?.first { it.id == id }?.likedByMe == false) {
                 repository.likeById(id)
-            } else {
+                } else {
                 repository.unLikeById(id)
             }
-            _data.postValue(FeedModel(posts = repository.getAll()))
+            _data.postValue(_data.value?.copy(posts = _data.value?.posts.orEmpty().let {
+                val updatedList = mutableListOf<Post>()
+                for (post in it) {
+                    if (post.id == updatedPost.id) {
+                        updatedList.add(updatedPost)
+                    } else {
+                        updatedList.add(post)
+                    }
+                }
+                updatedList
+            } ))
         }
     }
 
@@ -97,5 +114,10 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
                 _data.postValue(_data.value?.copy(posts = old))
             }
         }
+    }
+
+    fun refreshPosts() {
+        _isRefreshing.value = true
+        loadPosts(onRefresh = true)
     }
 }

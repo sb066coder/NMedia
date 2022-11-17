@@ -89,8 +89,11 @@ class FeedFragment : Fragment() {
         }
 
         binding.swiper.setOnRefreshListener {
-            binding.swiper.isRefreshing = false
-            viewModel.loadPosts()
+            viewModel.refreshPosts()
+        }
+
+        viewModel.isRefreshing.observe(viewLifecycleOwner) {
+            binding.swiper.isRefreshing = it
         }
 
 

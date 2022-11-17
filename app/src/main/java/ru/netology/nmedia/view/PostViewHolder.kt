@@ -48,4 +48,12 @@ class PostViewHolder(
             root.setOnClickListener { onInteractionListener.onOpenPost(post) }
         }
     }
+
+    fun bindOnLikeChanged(likedByMe: Boolean, likes: Int) {
+        with(binding.mbLike) {
+            isChecked = likedByMe
+            text = ViewUtils.formattedNumber(likes)
+        }
+
+    }
 }
