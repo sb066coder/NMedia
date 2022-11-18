@@ -1,5 +1,6 @@
 package ru.netology.nmedia.view
 
+import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
@@ -49,10 +50,11 @@ class PostViewHolder(
         }
     }
 
-    fun bindOnLikeChanged(likedByMe: Boolean, likes: Int) {
+    fun bindOnLikeChanged(post: Post) {
         with(binding.mbLike) {
-            isChecked = likedByMe
-            text = ViewUtils.formattedNumber(likes)
+            isChecked = post.likedByMe
+            text = ViewUtils.formattedNumber(post.likes)
+            setOnClickListener { onInteractionListener.onLike(post) }
         }
 
     }

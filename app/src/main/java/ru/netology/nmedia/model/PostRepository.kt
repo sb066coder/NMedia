@@ -1,18 +1,17 @@
 package ru.netology.nmedia.model
 
 interface PostRepository {
-    fun getAll(): List<Post>
-    fun likeById(id: Long): Post
-    fun unLikeById(id: Long): Post
+//    fun getAll(): List<Post>
+    fun getAllAsync(callback: Callback<List<Post>>)
+    fun likeByIdAsync(plusLike: Boolean, id: Long, callback: Callback<Post>)
 
     //    fun shareById(id: Long)
-    fun deleteById(id: Long)
-    fun save(post: Post)
+    fun deleteByIdAsync(id: Long, callback: Callback<Unit>)
+    fun saveAsync(post: Post, callback: Callback<Post>)
 
-    fun getAllAsync(callback: GetAllCallback)
 
-    interface GetAllCallback {
-        fun onSuccess(posts: List<Post>)
+    interface Callback<T> {
+        fun onSuccess(response: T)
         fun onError(e: Exception)
     }
 }
