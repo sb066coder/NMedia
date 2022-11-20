@@ -11,7 +11,7 @@
     <string name="chooser_share_post">Поделиться постом</string>
     <string name="add_post">Добавить пост</string>
     <string name="incoming_text_n">Принятый текст\n</string>
-    <string name="video_content">Video content</string>
+    <string name="image_content">Image content</string>
     <string name="retry_text">Что-то пошло не так. Попробуйте обновить позже</string>
     <string name="retry">Обновить</string>
     <string name="empty_posts_text">Постов нет. Если вы создадите пост, он появится здесь</string>

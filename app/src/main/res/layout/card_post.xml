@@ -7,7 +7,7 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/avatar"
+        android:id="@+id/ivAvatar"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
         android:layout_margin="@dimen/common_space_mod_2"
@@ -23,9 +23,9 @@
         android:layout_height="wrap_content"
         android:maxLines="1"
         android:ellipsize="end"
-        app:layout_constraintTop_toTopOf="@id/avatar"
+        app:layout_constraintTop_toTopOf="@id/ivAvatar"
         app:layout_constraintBottom_toTopOf="@id/tvPublished"
-        app:layout_constraintStart_toEndOf="@id/avatar"
+        app:layout_constraintStart_toEndOf="@id/ivAvatar"
         app:layout_constraintEnd_toStartOf="@id/mbMenu"
         android:layout_marginStart="@dimen/common_space_mod_2"
         android:layout_marginEnd="@dimen/common_space_mod_2"
@@ -36,8 +36,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tvAuthor"
-        app:layout_constraintBottom_toBottomOf="@id/avatar"
-        app:layout_constraintStart_toEndOf="@id/avatar"
+        app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+        app:layout_constraintStart_toEndOf="@id/ivAvatar"
         android:layout_marginStart="@dimen/common_space_mod_2"
         tools:text="@sample/posts.json/data/published"/>
 
@@ -61,38 +61,40 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="avatar, tvPublished, mbMenu"
+        app:constraint_referenced_ids="ivAvatar, tvPublished, mbMenu"
         tools:layout_editor_absoluteY="80dp" />
-
-    <ImageView
-        android:id="@+id/ivVideoContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/common_space_mod_2"
-        android:adjustViewBounds="true"
-        app:layout_constraintBottom_toTopOf="@id/tvContent"
-        app:layout_constraintTop_toBottomOf="@id/firstBarrier"
-        app:srcCompat="@drawable/video_content_dummy"
-        tools:visibility="visible"
-        android:visibility="gone"
-        android:contentDescription="@string/video_content" />
 
     <TextView
         android:id="@+id/tvContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/ivVideoContent"
-        app:layout_constraintBottom_toTopOf="@id/secondBarrier"
+        app:layout_constraintTop_toBottomOf="@id/firstBarrier"
+        app:layout_constraintBottom_toTopOf="@id/ivContent"
         android:layout_margin="@dimen/common_space_mod_2"
         tools:text="@sample/posts.json/data/content"
         android:autoLink="web"/>
+
+    <ImageView
+        android:id="@+id/ivContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/common_space_mod_2"
+        android:layout_marginEnd="@dimen/common_space_mod_2"
+        android:layout_marginBottom="@dimen/common_space_mod_2"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toTopOf="@id/secondBarrier"
+        app:layout_constraintTop_toBottomOf="@id/tvContent"
+        app:srcCompat="@drawable/video_content_dummy"
+        tools:visibility="visible"
+        android:visibility="gone"
+        android:contentDescription="@string/image_content" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/secondBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="tvContent"
+        app:constraint_referenced_ids="ivContent"
         tools:layout_editor_absoluteY="281dp" />
 
     <com.google.android.material.button.MaterialButton

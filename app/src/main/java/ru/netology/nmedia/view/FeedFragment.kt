@@ -63,10 +63,10 @@ class FeedFragment : Fragment() {
                         Bundle().apply { textArg = post.content }
                     )
                 }
-                override fun onViewVideo(post: Post) {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.videoContent))
-                    startActivity(intent)
-                }
+//                override fun onViewVideo(post: Post) {
+//                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.videoContent))
+//                    startActivity(intent)
+//                }
                 override fun onOpenPost(post: Post) {
                     findNavController().navigate(
                         R.id.action_feedFragment_to_openPostFragment,

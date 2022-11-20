@@ -4,9 +4,11 @@ import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.model.PostRepositoryServerImpl.Companion.BASE_URL
 import ru.netology.nmedia.util.ViewUtils
 
 class PostViewHolder(
@@ -44,8 +46,27 @@ class PostViewHolder(
                     }
                 }.show()
             }
-            ivVideoContent.visibility = if (post.videoContent != null)  View.VISIBLE else View.GONE
-            ivVideoContent.setOnClickListener { onInteractionListener.onViewVideo(post) }
+
+            val url = "${BASE_URL}/avatars/${post.authorAvatar}"
+            Glide.with(ivAvatar)
+                .load(url)
+                .timeout(10_000)
+                .placeholder(R.drawable.ic_baseline_image_24)
+                .error(R.drawable.ic_baseline_cancel_24)
+                .circleCrop()
+                .into(ivAvatar)
+
+            if (post.attachment != null) {
+                ivContent.visibility = View.VISIBLE
+                Glide.with(ivContent)
+                    .load("${BASE_URL}/images/${post.attachment.url}")
+                    .timeout(10_000)
+                    .placeholder(R.drawable.ic_baseline_image_24)
+                    .error(R.drawable.ic_baseline_cancel_24)
+                    .into(ivContent)
+            } else {
+                ivContent.visibility = View.GONE
+            }
             root.setOnClickListener { onInteractionListener.onOpenPost(post) }
         }
     }

@@ -10,9 +10,11 @@ import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentOpenPostBinding
 import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.model.PostRepositoryServerImpl
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.ViewUtils
 import ru.netology.nmedia.view.FeedFragment.Companion.numArg
@@ -52,12 +54,8 @@ class OpenPostFragment : Fragment() {
                     mbLike.text = ViewUtils.formattedNumber(post.likes)
                     mbShare.text = ViewUtils.formattedNumber(post.shares)
                     mbWatch.text = ViewUtils.formattedNumber(post.watches)
-                    ivVideoContent.visibility =
-                        if (post.videoContent != null) View.VISIBLE else View.GONE
-                    //            fillInPostData(this)
                     mbLike.setOnClickListener { viewModel.likeById(post.id) }
                     mbShare.setOnClickListener {
-//                        viewModel.shareById(post.id)
                         val intent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, post.content)
@@ -90,9 +88,26 @@ class OpenPostFragment : Fragment() {
                             }
                         }.show()
                     }
-                    ivVideoContent.setOnClickListener {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.videoContent))
-                        startActivity(intent)
+
+                    val url = "${PostRepositoryServerImpl.BASE_URL}/avatars/${post.authorAvatar}"
+                    Glide.with(ivAvatar)
+                        .load(url)
+                        .timeout(10_000)
+                        .placeholder(R.drawable.ic_baseline_image_24)
+                        .error(R.drawable.ic_baseline_cancel_24)
+                        .circleCrop()
+                        .into(ivAvatar)
+
+                    if (post.attachment != null) {
+                        ivContent.visibility = View.VISIBLE
+                        Glide.with(ivContent)
+                            .load("${PostRepositoryServerImpl.BASE_URL}/images/${post.attachment.url}")
+                            .timeout(10_000)
+                            .placeholder(R.drawable.ic_baseline_image_24)
+                            .error(R.drawable.ic_baseline_cancel_24)
+                            .into(ivContent)
+                    } else {
+                        ivContent.visibility = View.GONE
                     }
                 }
             }

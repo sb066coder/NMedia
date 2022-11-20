@@ -11,6 +11,7 @@ import kotlin.concurrent.thread
 private val empty = Post(
     id = 0,
     author = "",
+    authorAvatar = "",
     content = "",
     published = "",
     likes = 0,
@@ -59,6 +60,9 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
         edited.value?.let {
             repository.saveAsync(it, object : PostRepository.Callback<Post> {
                 override fun onSuccess(response: Post) {
+                    _data.postValue(FeedModel(_data.value?.posts.orEmpty().also { posts ->
+                        posts.toMutableList().add(response)
+                    }))
                     _postCreated.postValue(Unit)
                 }
                 override fun onError(e: Exception) {
