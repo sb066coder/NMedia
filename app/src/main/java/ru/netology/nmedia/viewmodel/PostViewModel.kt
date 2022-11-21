@@ -1,9 +1,11 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import okhttp3.internal.wait
 import ru.netology.nmedia.model.*
 import ru.netology.nmedia.util.SingleLiveEvent
 import kotlin.concurrent.thread
@@ -57,20 +59,31 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
     }
 
     fun save() {
-        edited.value?.let {
-            repository.saveAsync(it, object : PostRepository.Callback<Post> {
-                override fun onSuccess(response: Post) {
-                    _data.postValue(FeedModel(_data.value?.posts.orEmpty().also { posts ->
-                        posts.toMutableList().add(response)
+        _data.postValue(_data.value?.copy(loading = true))  // включаем прогресс загрузки
+        edited.value?.let { edited ->   // берем измененный пост
+            repository.saveAsync(edited, object : PostRepository.Callback<Post> {   // выполняем асинхронный вызов функции saveAsync
+                override fun onSuccess(response: Post) {    // в случае успеха
+                    _data.postValue(FeedModel(_data.value?.posts.orEmpty().let { list ->
+                        if (edited.id == 0L) {  // если пост новый
+                            list.toMutableList().also { it.add(0, response) }   // добавляем его в список
+                        } else {    // если пост старый и мы его редактируем
+                            val newList = mutableListOf<Post>() // заменяем старый пост новым
+                            list.forEach { if (it.id == response.id) {
+                                    newList.add(response)
+                                } else {
+                                    newList.add(it)
+                                }}
+                            newList
+                        }
                     }))
-                    _postCreated.postValue(Unit)
+                    _postCreated.postValue(Unit)    // записываем в _postCreated, что создали пост
                 }
-                override fun onError(e: Exception) {
-                    println(e.message)
+                override fun onError(e: Exception) {    // в случае неуспеха
+                    println(e.message)  // сообщаем в консоль
                 }
             })
         }
-        edited.value = empty
+        edited.value = empty    // записываем в edited новый пустой пост
     }
 
     fun edit(post: Post) {
@@ -110,7 +123,6 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
         })
     }
 
-//    fun shareById(id: Long) = repository.shareById(id)
     fun deleteById(id: Long) {
         _data.postValue(_data.value?.copy(loading = true))
         val new = _data.value?.posts.orEmpty().filter { it.id != id }

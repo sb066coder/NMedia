@@ -16,7 +16,6 @@ class PostRepositoryServerImpl: PostRepository {
         .build()
     private val gson = Gson()
     private val typeToken = object : TypeToken<List<Post>>() {}
-    private val typeTokenPost = object : TypeToken<Post>() {}
 
     companion object {
         const val BASE_URL = "http://10.0.2.2:9999"
@@ -53,7 +52,7 @@ class PostRepositoryServerImpl: PostRepository {
                 override fun onResponse(call: Call, response: Response) {
                     try {
                         val body = response.body?.string() ?: throw java.lang.RuntimeException("body is null")
-                        callback.onSuccess(gson.fromJson(body, typeTokenPost.type))
+                        callback.onSuccess(gson.fromJson(body, Post::class.java))
                     } catch (e: Exception) {
                         callback.onError(e)
                     }
@@ -90,7 +89,7 @@ class PostRepositoryServerImpl: PostRepository {
                 override fun onResponse(call: Call, response: Response) {
                     try {
                         val body = response.body?.string() ?: throw java.lang.RuntimeException("body is null")
-                        callback.onSuccess(gson.fromJson(body, typeTokenPost.type))
+                        callback.onSuccess(gson.fromJson(body, Post::class.java))
                     } catch (e: Exception) {
                         callback.onError(e)
                     }
