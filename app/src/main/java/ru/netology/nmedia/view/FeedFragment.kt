@@ -3,6 +3,7 @@ package ru.netology.nmedia.view
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,20 +34,17 @@ class FeedFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Создание объекта binding с наполнением из activity_main
         val binding = FragmentFeedBinding.inflate(
             inflater,
             container,
             false
         )
 
-        // Создание адаптера
         val adapter = PostsAdapter (
             object : OnInteractionListener {
                 override fun onLike(post: Post) { viewModel.likeById(post.id) }
                 override fun onRemove(post: Post) { viewModel.deleteById(post.id) }
                 override fun onShare(post: Post) {
-//                    viewModel.shareById(post.id)
                     val intent = Intent().apply {
                         action = Intent.ACTION_SEND
                         putExtra(Intent.EXTRA_TEXT, post.content)
@@ -62,10 +60,7 @@ class FeedFragment : Fragment() {
                         Bundle().apply { textArg = post.content }
                     )
                 }
-                override fun onViewVideo(post: Post) {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.videoContent))
-                    startActivity(intent)
-                }
+
                 override fun onOpenPost(post: Post) {
                     findNavController().navigate(
                         R.id.action_feedFragment_to_openPostFragment,
@@ -96,9 +91,12 @@ class FeedFragment : Fragment() {
             binding.swiper.isRefreshing = it
         }
 
-
         binding.fabAdd.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_editPostFragment)
+        }
+
+        viewModel.postCreated.observe(viewLifecycleOwner) {
+            adapter.submitList(viewModel.data.value?.posts)
         }
 
         return binding.root

@@ -27,12 +27,11 @@ class PostsAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        val post = getItem(position)
         if (payloads.isEmpty()) {
-            holder.bind(post)
+            super.onBindViewHolder(holder, position, payloads)
         } else {
             if (payloads[0] == true) {
-                holder.bindOnLikeChanged(post.likedByMe, post.likes)
+                holder.bindOnLikeChanged(getItem(position))
             }
         }
     }

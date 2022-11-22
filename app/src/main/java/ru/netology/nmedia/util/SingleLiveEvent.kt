@@ -7,7 +7,6 @@ import androidx.lifecycle.Observer
 import java.util.concurrent.atomic.AtomicBoolean
 
 class SingleLiveEvent<T> : MutableLiveData<T>() {
-    // FIXME: упрощенный вариант пока не прошли Atomic'и - FIXED using AtomicBoolean
     private var pending = AtomicBoolean(false)
 
     @MainThread

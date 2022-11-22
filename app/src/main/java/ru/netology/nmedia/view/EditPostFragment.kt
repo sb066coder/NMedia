@@ -43,7 +43,9 @@ class EditPostFragment : Fragment() {
             arguments?.textArg.let( binding.etContent::setText )
         }
 
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 sPref.edit().apply {
                         putString(DRAFT_KEY, binding.etContent.text.toString())
@@ -61,9 +63,6 @@ class EditPostFragment : Fragment() {
                 apply()
             }
             AndroidUtils.hideKeyboard(requireView())
-        }
-        viewModel.postCreated.observe(viewLifecycleOwner) {
-            viewModel.loadPosts()
             findNavController().navigateUp()
         }
 
