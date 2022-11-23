@@ -106,6 +106,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/secondBarrier"
         app:icon="@drawable/ic_like_select"
+        app:toggleCheckedStateOnClick="false"
         app:iconTint="@color/like_checkbox_tint"
         tools:checked="true"
         tools:text="@sample/posts.json/data/likes"

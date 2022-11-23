@@ -1,14 +1,12 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
-import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import okhttp3.internal.wait
 import ru.netology.nmedia.model.*
 import ru.netology.nmedia.util.SingleLiveEvent
-import kotlin.concurrent.thread
 
 private val empty = Post(
     id = 0,
@@ -79,7 +77,8 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
                     _postCreated.postValue(Unit)    // записываем в _postCreated, что создали пост
                 }
                 override fun onError(e: Exception) {    // в случае неуспеха
-                    println(e.message)  // сообщаем в консоль
+                    Toast.makeText(getApplication(), "Server error appeared", Toast.LENGTH_LONG).show() // сообщаем об ошибке
+                    _data.postValue(_data.value?.copy(loading = false)) // выключаем прогресс загрузки
                 }
             })
         }
@@ -117,7 +116,8 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
             }
 
             override fun onError(e: Exception) {
-                println(e.message ?: "Unknown error")
+                Toast.makeText(getApplication(), "Server error appeared", Toast.LENGTH_LONG).show()
+                _data.postValue(_data.value?.copy(loading = false))
             }
 
         })
@@ -131,8 +131,8 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
                 _data.postValue(_data.value?.copy(posts = new, loading = false, empty = new.isEmpty()))
             }
             override fun onError(e: Exception) {
+                Toast.makeText(getApplication(), "Server error appeared", Toast.LENGTH_LONG).show()
                 _data.postValue(_data.value?.copy(loading = false))
-                println("Unsuccessful")
             }
         })
     }

@@ -13,6 +13,7 @@ import ru.netology.nmedia.databinding.FragmentEditPostBinding
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
+
 const val DRAFT_KEY = "draft"
 class EditPostFragment : Fragment() {
 

@@ -1,9 +1,7 @@
 package ru.netology.nmedia.view
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +40,7 @@ class FeedFragment : Fragment() {
 
         val adapter = PostsAdapter (
             object : OnInteractionListener {
-                override fun onLike(post: Post) { viewModel.likeById(post.id) }
+                override fun onLike(post: Post) {  viewModel.likeById(post.id) }
                 override fun onRemove(post: Post) { viewModel.deleteById(post.id) }
                 override fun onShare(post: Post) {
                     val intent = Intent().apply {
