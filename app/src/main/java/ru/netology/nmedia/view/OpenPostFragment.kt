@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
-import ru.netology.nmedia.api.BASE_URL
 import ru.netology.nmedia.databinding.FragmentOpenPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.StringArg
@@ -54,7 +54,7 @@ class OpenPostFragment : Fragment() {
                     mbLike.text = ViewUtils.formattedNumber(post.likes)
                     mbShare.text = ViewUtils.formattedNumber(post.shares)
                     mbWatch.text = ViewUtils.formattedNumber(post.watches)
-                    mbLike.setOnClickListener { viewModel.likeById(post.id) }
+                    mbLike.setOnClickListener { viewModel.likeById(!post.likedByMe, post.id) }
                     mbShare.setOnClickListener {
                         val intent = Intent().apply {
                             action = Intent.ACTION_SEND
@@ -112,6 +112,11 @@ class OpenPostFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.errorAppeared.observe(viewLifecycleOwner) {
+            Toast.makeText(context, "Server error appeared", Toast.LENGTH_LONG).show()
+        }
+
         return binding.root
     }
 }

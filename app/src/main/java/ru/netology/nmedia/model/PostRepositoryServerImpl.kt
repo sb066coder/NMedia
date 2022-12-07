@@ -1,84 +1,72 @@
 package ru.netology.nmedia.model
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import androidx.lifecycle.map
 import ru.netology.nmedia.api.PostApi
+import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.entity.PostEntity
+import ru.netology.nmedia.entity.toDto
+import ru.netology.nmedia.entity.toEntity
 
-class PostRepositoryServerImpl: PostRepository {
+class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
 
-    override fun getAllAsync(callback: PostRepository.Callback<List<Post>>) {
-        PostApi.service.getPosts()
-            .enqueue(object : Callback<List<Post>> {
+    override val data = postDao.getAll().map(List<PostEntity>::toDto)
 
-                override fun onResponse(call: Call<List<Post>>, response: Response<List<Post>>) {
-                    if (!response.isSuccessful) {
-                        callback.onError(RuntimeException(response.message()))
-                        return
-                    }
-                    callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
-                }
-
-                override fun onFailure(call: Call<List<Post>>, t: Throwable) {
-                    callback.onError(RuntimeException(t))
-                }
-            })
-    }
-
-    override fun likeByIdAsync(plusLike: Boolean, id: Long, callback: PostRepository.Callback<Post>) {
-        val request = if (plusLike) {
-            PostApi.service.likeById(id)
-        } else {
-            PostApi.service.disLikeById(id)
+    override suspend fun getAll(): List<Post> {
+        try {
+            val response = PostApi.service.getPosts()
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.message())
+            }
+            return response.body()?.also {
+                postDao.insert(it.toEntity())
+            } ?: throw RuntimeException("body is null")
+        } catch (e: Exception) {
+            throw RuntimeException("unknown error")
         }
-        request.enqueue(object : Callback<Post> {
-            override fun onResponse(call: Call<Post>, response: Response<Post>) {
-                if (!response.isSuccessful) {
-                    callback.onError(RuntimeException(response.message()))
-                    return
-                }
-                callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
-            }
-
-            override fun onFailure(call: Call<Post>, t: Throwable) {
-                callback.onError(RuntimeException(t))
-            }
-
-        })
     }
 
-    override fun deleteByIdAsync(id: Long, callback: PostRepository.Callback<Unit>) {
-        PostApi.service.delete(id)
-            .enqueue(object : Callback<Unit> {
-
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if (!response.isSuccessful) {
-                        callback.onError(RuntimeException(response.message()))
-                        return
-                    }
-                    callback.onSuccess(Unit)
-                }
-
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    callback.onError(RuntimeException(t))
-                }
-            })
+    override suspend fun likeById(plusLike: Boolean, id: Long) {
+        try {
+            postDao.likeById(id)
+            val response = if (plusLike) {
+                PostApi.service.likeById(id)
+            } else {
+                PostApi.service.disLikeById(id)
+            }
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.message())
+            }
+        } catch (e: Exception) {
+            postDao.likeById(id)
+            throw RuntimeException("unknown error")
+        }
     }
 
-    override fun saveAsync(post: Post, callback: PostRepository.Callback<Post>) {
-        PostApi.service.save(post)
-            .enqueue(object : Callback<Post> {
-                override fun onResponse(call: Call<Post>, response: Response<Post>) {
-                    if (!response.isSuccessful) {
-                        callback.onError(RuntimeException(response.message()))
-                        return
-                    }
-                    callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
-                }
+    override suspend fun deleteById(id: Long) {
+        val justDeleted = postDao.getById(id).toDto()
+        postDao.removeById(id)
+        try {
+            val response = PostApi.service.delete(id)
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.message())
+            }
+        } catch (e: Exception) {
+            postDao.insert(PostEntity.fromDto(justDeleted))
+            throw RuntimeException("unknown error")
+        }
+    }
 
-                override fun onFailure(call: Call<Post>, t: Throwable) {
-                    callback.onError(RuntimeException(t))
-                }
-            })
+    override suspend fun save(post: Post) {
+        try {
+            val response = PostApi.service.save(post)
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.message())
+            }
+            response.body()?.also {
+                postDao.save(PostEntity.fromDto(it))
+            } ?: throw RuntimeException("body is null")
+        } catch (e: Exception) {
+            throw RuntimeException("unknown error")
+        }
     }
 }

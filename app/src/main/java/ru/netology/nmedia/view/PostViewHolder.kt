@@ -5,7 +5,6 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
-import ru.netology.nmedia.api.BASE_URL
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.ViewUtils
@@ -16,7 +15,7 @@ class PostViewHolder(
 ) : RecyclerView.ViewHolder(binding.root){
 
     companion object {
-        const val G_BASE_URL = "http://10.0.2.2:9999"   // base URL for using in Glide
+        const val G_BASE_URL = "http://192.168.43.124:9999"   // base URL for using in Glide
     }
 
     fun bind(post: Post) {
