@@ -1,18 +1,19 @@
 package ru.netology.nmedia.view
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentFeedBinding
+import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.LongArg
@@ -42,7 +43,7 @@ class FeedFragment : Fragment() {
 
         val adapter = PostsAdapter (
             object : OnInteractionListener {
-                override fun onLike(post: Post) { viewModel.likeById(post.id) }
+                override fun onLike(post: Post) {  viewModel.likeById(!post.likedByMe, post.id) }
                 override fun onRemove(post: Post) { viewModel.deleteById(post.id) }
                 override fun onShare(post: Post) {
                     val intent = Intent().apply {
@@ -74,13 +75,22 @@ class FeedFragment : Fragment() {
 
         viewModel.data.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.posts)
-            binding.progress.isVisible = state.loading
-            binding.errorGroup.isVisible = state.error
             binding.tvEmptyText.isVisible = state.empty
         }
 
-        binding.btnRetry.setOnClickListener {
-            viewModel.loadPosts()
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            binding.progress.isVisible = state is FeedModelState.Loading
+            binding.swiper.isRefreshing = state is FeedModelState.Refreshing
+            if (state is FeedModelState.Error) {
+                Snackbar.make(
+                    binding.root,
+                    R.string.retry_text,
+                    Snackbar.LENGTH_SHORT
+                ).setAction(R.string.retry) {
+                    viewModel.retry()
+                }
+                    .show()
+            }
         }
 
         binding.swiper.setOnRefreshListener {
@@ -97,6 +107,10 @@ class FeedFragment : Fragment() {
 
         viewModel.postCreated.observe(viewLifecycleOwner) {
             adapter.submitList(viewModel.data.value?.posts)
+        }
+
+        viewModel.errorAppeared.observe(viewLifecycleOwner) {
+            Toast.makeText(context, "Server error appeared", Toast.LENGTH_LONG).show()
         }
 
         return binding.root

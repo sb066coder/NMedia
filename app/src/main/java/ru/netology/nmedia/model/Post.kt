@@ -7,8 +7,8 @@ data class Post(
     val content: String,
     val published: String,
     val likes: Int,
-    val shares: Int,
-    val watches: Int,
+    val shares: Int = 0,
+    val watches: Int = 0,
     val likedByMe: Boolean = false,
     val attachment: Attachment? = null
 )

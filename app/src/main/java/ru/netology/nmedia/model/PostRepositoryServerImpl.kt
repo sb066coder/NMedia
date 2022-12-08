@@ -1,102 +1,72 @@
 package ru.netology.nmedia.model
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.internal.EMPTY_REQUEST
-import java.io.IOException
-import java.util.concurrent.TimeUnit
+import androidx.lifecycle.map
+import ru.netology.nmedia.api.PostApi
+import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.entity.PostEntity
+import ru.netology.nmedia.entity.toDto
+import ru.netology.nmedia.entity.toEntity
 
-class PostRepositoryServerImpl: PostRepository {
+class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .build()
-    private val gson = Gson()
-    private val typeToken = object : TypeToken<List<Post>>() {}
+    override val data = postDao.getAll().map(List<PostEntity>::toDto)
 
-    companion object {
-        const val BASE_URL = "http://10.0.2.2:9999"
-        private val jsonType = "application/json".toMediaType()
+    override suspend fun getAll(): List<Post> {
+        try {
+            val response = PostApi.service.getPosts()
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.message())
+            }
+            return response.body()?.also {
+                postDao.insert(it.toEntity())
+            } ?: throw RuntimeException("body is null")
+        } catch (e: Exception) {
+            throw RuntimeException("unknown error")
+        }
     }
 
-    override fun getAllAsync(callback: PostRepository.Callback<List<Post>>) {
-        val request: Request = Request.Builder()
-            .url("${BASE_URL}/api/slow/posts")
-            .build()
-        client.newCall(request)
-            .enqueue(object : Callback {
-                override fun onResponse(call: Call, response: Response) {
-                    try {
-                        val body = response.body?.string() ?: throw java.lang.RuntimeException("body is null")
-                        callback.onSuccess(gson.fromJson(body, typeToken.type))
-                    } catch (e: Exception) {
-                        callback.onError(e)
-                    }
-                }
-                override fun onFailure(call: Call, e: IOException) {
-                    callback.onError(e)
-                }
-            })
+    override suspend fun likeById(plusLike: Boolean, id: Long) {
+        try {
+            postDao.likeById(id)
+            val response = if (plusLike) {
+                PostApi.service.likeById(id)
+            } else {
+                PostApi.service.disLikeById(id)
+            }
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.message())
+            }
+        } catch (e: Exception) {
+            postDao.likeById(id)
+            throw RuntimeException("unknown error")
+        }
     }
 
-    override fun likeByIdAsync(plusLike: Boolean, id: Long, callback: PostRepository.Callback<Post>) {
-        val request: Request = Request.Builder()
-            .let { if (plusLike) it.post(EMPTY_REQUEST) else it.delete() }
-            .url("${BASE_URL}/api/slow/posts/$id/likes")
-            .build()
-        client.newCall(request)
-            .enqueue(object : Callback {
-                override fun onResponse(call: Call, response: Response) {
-                    try {
-                        val body = response.body?.string() ?: throw java.lang.RuntimeException("body is null")
-                        callback.onSuccess(gson.fromJson(body, Post::class.java))
-                    } catch (e: Exception) {
-                        callback.onError(e)
-                    }
-                }
-                override fun onFailure(call: Call, e: IOException) {
-                    callback.onError(e)
-                }
-            })
+    override suspend fun deleteById(id: Long) {
+        val justDeleted = postDao.getById(id).toDto()
+        postDao.removeById(id)
+        try {
+            val response = PostApi.service.delete(id)
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.message())
+            }
+        } catch (e: Exception) {
+            postDao.insert(PostEntity.fromDto(justDeleted))
+            throw RuntimeException("unknown error")
+        }
     }
 
-    override fun deleteByIdAsync(id: Long, callback: PostRepository.Callback<Unit>) {
-        val request: Request = Request.Builder()
-            .delete()
-            .url("${BASE_URL}/api/slow/posts/$id")
-            .build()
-        client.newCall(request)
-            .enqueue(object : Callback {
-                override fun onResponse(call: Call, response: Response) {
-                    callback.onSuccess(Unit)
-                }
-                override fun onFailure(call: Call, e: IOException) {
-                    callback.onError(e)
-                }
-            })
-    }
-
-    override fun saveAsync(post: Post, callback: PostRepository.Callback<Post>) {
-        val request: Request = Request.Builder()
-            .post(gson.toJson(post).toRequestBody(jsonType))
-            .url("${BASE_URL}/api/slow/posts")
-            .build()
-        client.newCall(request)
-            .enqueue(object : Callback {
-                override fun onResponse(call: Call, response: Response) {
-                    try {
-                        val body = response.body?.string() ?: throw java.lang.RuntimeException("body is null")
-                        callback.onSuccess(gson.fromJson(body, Post::class.java))
-                    } catch (e: Exception) {
-                        callback.onError(e)
-                    }
-                }
-                override fun onFailure(call: Call, e: IOException) {
-                    callback.onError(e)
-                }
-            })
+    override suspend fun save(post: Post) {
+        try {
+            val response = PostApi.service.save(post)
+            if (!response.isSuccessful) {
+                throw RuntimeException(response.message())
+            }
+            response.body()?.also {
+                postDao.save(PostEntity.fromDto(it))
+            } ?: throw RuntimeException("body is null")
+        } catch (e: Exception) {
+            throw RuntimeException("unknown error")
+        }
     }
 }

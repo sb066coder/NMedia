@@ -1,6 +1,5 @@
 package ru.netology.nmedia.view
 
-import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
@@ -8,13 +7,16 @@ import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.model.Post
-import ru.netology.nmedia.model.PostRepositoryServerImpl.Companion.BASE_URL
 import ru.netology.nmedia.util.ViewUtils
 
 class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root){
+
+    companion object {
+        const val G_BASE_URL = "http://192.168.43.124:9999"   // base URL for using in Glide
+    }
 
     fun bind(post: Post) {
         binding.apply {
@@ -47,7 +49,7 @@ class PostViewHolder(
                 }.show()
             }
 
-            val url = "${BASE_URL}/avatars/${post.authorAvatar}"
+            val url = "$G_BASE_URL/avatars/${post.authorAvatar}"
             Glide.with(ivAvatar)
                 .load(url)
                 .timeout(10_000)
@@ -59,7 +61,7 @@ class PostViewHolder(
             if (post.attachment != null) {
                 ivContent.visibility = View.VISIBLE
                 Glide.with(ivContent)
-                    .load("${BASE_URL}/images/${post.attachment.url}")
+                    .load("$G_BASE_URL/images/${post.attachment.url}")
                     .timeout(10_000)
                     .placeholder(R.drawable.ic_baseline_image_24)
                     .error(R.drawable.ic_baseline_cancel_24)

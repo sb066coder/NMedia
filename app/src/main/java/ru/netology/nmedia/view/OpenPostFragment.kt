@@ -1,12 +1,12 @@
 package ru.netology.nmedia.view
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -14,10 +14,10 @@ import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentOpenPostBinding
 import ru.netology.nmedia.model.Post
-import ru.netology.nmedia.model.PostRepositoryServerImpl
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.ViewUtils
 import ru.netology.nmedia.view.FeedFragment.Companion.numArg
+import ru.netology.nmedia.view.PostViewHolder.Companion.G_BASE_URL
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class OpenPostFragment : Fragment() {
@@ -54,7 +54,7 @@ class OpenPostFragment : Fragment() {
                     mbLike.text = ViewUtils.formattedNumber(post.likes)
                     mbShare.text = ViewUtils.formattedNumber(post.shares)
                     mbWatch.text = ViewUtils.formattedNumber(post.watches)
-                    mbLike.setOnClickListener { viewModel.likeById(post.id) }
+                    mbLike.setOnClickListener { viewModel.likeById(!post.likedByMe, post.id) }
                     mbShare.setOnClickListener {
                         val intent = Intent().apply {
                             action = Intent.ACTION_SEND
@@ -89,7 +89,7 @@ class OpenPostFragment : Fragment() {
                         }.show()
                     }
 
-                    val url = "${PostRepositoryServerImpl.BASE_URL}/avatars/${post.authorAvatar}"
+                    val url = "${G_BASE_URL}/avatars/${post.authorAvatar}"
                     Glide.with(ivAvatar)
                         .load(url)
                         .timeout(10_000)
@@ -101,7 +101,7 @@ class OpenPostFragment : Fragment() {
                     if (post.attachment != null) {
                         ivContent.visibility = View.VISIBLE
                         Glide.with(ivContent)
-                            .load("${PostRepositoryServerImpl.BASE_URL}/images/${post.attachment.url}")
+                            .load("$G_BASE_URL/images/${post.attachment.url}")
                             .timeout(10_000)
                             .placeholder(R.drawable.ic_baseline_image_24)
                             .error(R.drawable.ic_baseline_cancel_24)
@@ -112,6 +112,11 @@ class OpenPostFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.errorAppeared.observe(viewLifecycleOwner) {
+            Toast.makeText(context, "Server error appeared", Toast.LENGTH_LONG).show()
+        }
+
         return binding.root
     }
 }
