@@ -3,9 +3,8 @@ package ru.netology.nmedia.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.*
 import ru.netology.nmedia.util.SingleLiveEvent
@@ -31,9 +30,9 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
     private val repository: PostRepository =
         PostRepositoryServerImpl(AppDb.getInstance(application).postDao())
 
-    val data: LiveData<FeedModel> = repository.data.map {
-        FeedModel(it, it.isEmpty())
-    }
+    val data: LiveData<FeedModel> = repository.data
+        .map { FeedModel(it, it.isEmpty()) }
+        .asLiveData(Dispatchers.Default)
 
     private val _state = SingleLiveEvent<FeedModelState>()
     val state: LiveData<FeedModelState>
@@ -52,6 +51,8 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
         get() = _errorAppeared
 
     private val scope = MainScope()
+
+    var onScroll = false
 
     private lateinit var lastFailArgs: Pair<ErrorType, Any>
 
@@ -90,6 +91,21 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
         edited.value = post
     }
 
+    val newerCount: LiveData<Int> = data.switchMap {
+        try {
+            repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
+                .asLiveData(Dispatchers.Default)
+        } catch (e: Exception) {
+            Log.e("Error", e.message ?: "Network error")
+            MutableLiveData(repository.getInvisibleAmount())
+        }
+    }
+
+    fun showNewPosts() = viewModelScope.launch {
+        onScroll = true
+        repository.showNewPosts()
+    }
+
     fun changeContent(content: String) {
         val text = content.trim()
         if (edited.value?.content == text) {
@@ -109,11 +125,9 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
 
     fun deleteById(id: Long) = viewModelScope.launch {
         try {
-            Log.i("AAA", "vm try delete")
             repository.deleteById(id)
         } catch (e: Exception) {
-            Log.i("AAA", "vm catch exception delete")
-            lastFailArgs = Pair(ErrorType.DELETE, id)
+            lastFailArgs = ErrorType.DELETE to id
             _state.value = FeedModelState.Error // сообщаем об ошибке
         }
     }
@@ -121,8 +135,8 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
     fun retry() {
         when (lastFailArgs.first) {
             ErrorType.LIKE -> likeById(
-                (lastFailArgs.second as Pair<Boolean, Long>).first,
-                (lastFailArgs.second as Pair<Boolean, Long>).second
+                (lastFailArgs.second as Pair<*, *>).first as Boolean,
+                (lastFailArgs.second as Pair<*, *>).second as Long
             )
             ErrorType.DELETE -> deleteById(lastFailArgs.second as Long)
             ErrorType.LOAD -> loadPosts()

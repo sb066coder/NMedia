@@ -14,10 +14,12 @@ data class PostEntity(
     val published: String,
     val likes: Int,
     val likedByMe: Boolean = false,
+    val shown: Boolean = true
 ) {
     fun toDto() = Post(
         id, author, authorAvatar, content, published, likes, 0, 0, likedByMe
     )
+    fun hide() = this.copy(shown = false)
 
     companion object {
         fun fromDto(dto: Post) = PostEntity(

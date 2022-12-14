@@ -15,7 +15,7 @@ class PostViewHolder(
 ) : RecyclerView.ViewHolder(binding.root){
 
     companion object {
-        const val G_BASE_URL = "http://192.168.43.124:9999"   // base URL for using in Glide
+        const val G_BASE_URL = "http://10.0.2.2:9999"   // base URL for using in Glide
     }
 
     fun bind(post: Post) {
