@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.*
@@ -92,13 +93,12 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
     }
 
     val newerCount: LiveData<Int> = data.switchMap {
-        try {
-            repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
-                .asLiveData(Dispatchers.Default)
-        } catch (e: Exception) {
-            Log.e("Error", e.message ?: "Network error")
-            MutableLiveData(repository.getInvisibleAmount())
-        }
+        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
+            .catch {
+                Log.e("Error", "Network error")
+                MutableLiveData(repository.getInvisibleAmount())
+            }
+            .asLiveData(Dispatchers.Default)
     }
 
     fun showNewPosts() = viewModelScope.launch {

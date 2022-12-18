@@ -1,7 +1,5 @@
 package ru.netology.nmedia.model
 
-import android.util.Log
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -11,7 +9,6 @@ import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
 import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.*
-import java.io.IOException
 
 class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
 
@@ -37,25 +34,17 @@ class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
 
     override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {
-            try {
-                delay(10_000L)
-                val response = PostApi.service.getNewer(id)
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
-                }
-                val body = response.body() ?: throw ApiError(response.code(), response.message())
-                postDao.insert(body.toEntity().map { it.hide() })
-                emit(body.size)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: IOException) {
-                Log.e("Error", e.message ?: "Network error")
-                emit(getInvisibleAmount())
-            } catch (e: Exception) {
-                throw UnknownError
+            delay(10_000L)
+            val response = PostApi.service.getNewer(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
             }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            postDao.insert(body.toEntity().map { it.hide() })
+            emit(body.size)
         }
     }
+        .catch { e -> throw AppError.from(e) }
         .flowOn(Dispatchers.Default)
 
     override fun getInvisibleAmount(): Int {
