@@ -15,4 +15,5 @@
     <string name="retry_text">Что-то пошло не так. Попробуйте обновить позже</string>
     <string name="retry">Обновить</string>
     <string name="empty_posts_text">Постов нет. Если вы создадите пост, он появится здесь</string>
+    <string name="fresh_posts">Новых постов</string>
 </resources>

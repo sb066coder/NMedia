@@ -1,5 +1,6 @@
 package ru.netology.nmedia.view
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,8 +16,8 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.Post
-import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.LongArg
+import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
@@ -30,6 +31,7 @@ class FeedFragment : Fragment() {
         ownerProducer = ::requireParentFragment
     )
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -74,7 +76,12 @@ class FeedFragment : Fragment() {
         binding.rvList.adapter = adapter
 
         viewModel.data.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.posts)
+            adapter.submitList(state.posts) {
+                if (viewModel.onScroll) {
+                    binding.rvList.smoothScrollToPosition(0)
+                    viewModel.onScroll = false
+                }
+            }
             binding.tvEmptyText.isVisible = state.empty
         }
 
@@ -111,6 +118,16 @@ class FeedFragment : Fragment() {
 
         viewModel.errorAppeared.observe(viewLifecycleOwner) {
             Toast.makeText(context, "Server error appeared", Toast.LENGTH_LONG).show()
+        }
+
+        viewModel.newerCount.observe(viewLifecycleOwner) {
+            binding.chNewItems.text = ("$it ${getString(R.string.fresh_posts)}")
+            binding.chNewItems.visibility = if (it > 0) View.VISIBLE else View.INVISIBLE
+        }
+
+        binding.chNewItems.setOnClickListener { chip ->
+            viewModel.showNewPosts()
+            chip.visibility = View.INVISIBLE
         }
 
         return binding.root

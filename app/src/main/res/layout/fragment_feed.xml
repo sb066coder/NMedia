@@ -51,6 +51,18 @@
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chNewItems"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/common_space_mod_2"
+        android:text="@string/fresh_posts"
+        android:textColor="@color/white"
+        app:chipBackgroundColor="@color/indigo_400"
+        android:visibility="invisible"
+        app:chipIcon="@drawable/ic_baseline_arrow_upward_24" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
         android:layout_width="wrap_content"

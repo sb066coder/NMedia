@@ -1,15 +1,20 @@
 package ru.netology.nmedia.model
 
-import androidx.lifecycle.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import ru.netology.nmedia.api.PostApi
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
 import ru.netology.nmedia.entity.toEntity
+import ru.netology.nmedia.error.*
 
 class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
 
-    override val data = postDao.getAll().map(List<PostEntity>::toDto)
+    override var data = postDao.getAll()
+        .map(List<PostEntity>::toDto)
+        .flowOn(Dispatchers.Default)
 
     override suspend fun getAll(): List<Post> {
         try {
@@ -23,6 +28,31 @@ class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
         } catch (e: Exception) {
             throw RuntimeException("unknown error")
         }
+    }
+
+
+
+    override fun getNewerCount(id: Long): Flow<Int> = flow {
+        while (true) {
+            delay(10_000L)
+            val response = PostApi.service.getNewer(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            postDao.insert(body.toEntity().map { it.hide() })
+            emit(body.size)
+        }
+    }
+        .catch { e -> throw AppError.from(e) }
+        .flowOn(Dispatchers.Default)
+
+    override fun getInvisibleAmount(): Int {
+        return postDao.getInvisibleAmount()
+    }
+
+    override suspend fun showNewPosts() {
+        postDao.showAll()
     }
 
     override suspend fun likeById(plusLike: Boolean, id: Long) {
