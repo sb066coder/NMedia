@@ -61,8 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="ivAvatar, tvPublished, mbMenu"
-        tools:layout_editor_absoluteY="80dp" />
+        app:constraint_referenced_ids="ivAvatar, tvPublished, mbMenu" />
 
     <TextView
         android:id="@+id/tvContent"
@@ -94,8 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="ivContent"
-        tools:layout_editor_absoluteY="281dp" />
+        app:constraint_referenced_ids="ivContent"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/mbLike"

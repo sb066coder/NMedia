@@ -1,6 +1,7 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.*
 import ru.netology.nmedia.util.SingleLiveEvent
+import java.io.File
 
 private val empty = Post(
     id = 0,
@@ -25,6 +27,8 @@ private val empty = Post(
 enum class ErrorType {
     LIKE, DELETE, LOAD, SAVE
 }
+
+private val noPhoto = PhotoModel()
 
 class PostViewModel(application: Application): AndroidViewModel(application) {
 
@@ -77,7 +81,12 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
             _postCreated.value = Unit
             viewModelScope.launch {
                 try {
-                    repository.save(it)
+                    when(_photo.value) {
+                        noPhoto -> repository.save(it)
+                        else -> _photo.value?.file?.let { file ->
+                            repository.saveWithAttachment(it, MediaUpload(file))
+                        }
+                    }
                     _state.value = FeedModelState.Idle
                 } catch (e: Exception) {
                     lastFailArgs = ErrorType.SAVE to Any()
@@ -86,6 +95,7 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
             }
         }
         edited.value = empty
+        _photo.value = noPhoto
     }
 
     fun edit(post: Post) {
@@ -152,5 +162,14 @@ class PostViewModel(application: Application): AndroidViewModel(application) {
     override fun onCleared() {
         super.onCleared()
         scope.cancel()
+    }
+
+
+    private val _photo = MutableLiveData(noPhoto)
+    val photo: LiveData<PhotoModel>
+        get() = _photo
+
+    fun changePhoto(uri: Uri?, file: File?) {
+        _photo.value = PhotoModel(uri, file)
     }
 }

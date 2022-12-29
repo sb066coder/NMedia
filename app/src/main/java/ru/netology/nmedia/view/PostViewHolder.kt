@@ -61,7 +61,7 @@ class PostViewHolder(
             if (post.attachment != null) {
                 ivContent.visibility = View.VISIBLE
                 Glide.with(ivContent)
-                    .load("$G_BASE_URL/images/${post.attachment.url}")
+                    .load("$G_BASE_URL/media/${post.attachment.url}")
                     .timeout(10_000)
                     .placeholder(R.drawable.ic_baseline_image_24)
                     .error(R.drawable.ic_baseline_cancel_24)
@@ -69,6 +69,11 @@ class PostViewHolder(
             } else {
                 ivContent.visibility = View.GONE
             }
+
+            ivContent.setOnClickListener {
+                onInteractionListener.onOpenImage("$G_BASE_URL/media/${post.attachment?.url}")
+            }
+
             root.setOnClickListener { onInteractionListener.onOpenPost(post) }
         }
     }
