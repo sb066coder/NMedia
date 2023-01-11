@@ -1,17 +1,15 @@
 package ru.netology.nmedia.api
 
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 import ru.netology.nmedia.BuildConfig
+import ru.netology.nmedia.model.Media
 import ru.netology.nmedia.model.Post
 import java.util.concurrent.TimeUnit
 
@@ -56,6 +54,10 @@ interface PostApiService {
 
     @DELETE("posts/{id}/likes")
     suspend fun disLikeById(@Path("id") id: Long): Response<Post>
+
+    @Multipart
+    @POST("media")
+    suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
 }
 
 object PostApi {

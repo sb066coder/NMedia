@@ -16,4 +16,7 @@
     <string name="retry">Обновить</string>
     <string name="empty_posts_text">Постов нет. Если вы создадите пост, он появится здесь</string>
     <string name="fresh_posts">Новых постов</string>
+    <string name="save">Сохранить</string>
+    <string name="remove">Удалить</string>
+    <string name="photo">Photo</string>
 </resources>

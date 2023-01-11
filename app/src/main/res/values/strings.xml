@@ -22,4 +22,7 @@
     <string name="retry">Retry</string>
     <string name="empty_posts_text">There are no posts.\nIf you create a new post, it will appear here</string>
     <string name="fresh_posts">New posts</string>
+    <string name="save">Save</string>
+    <string name="remove">Remove</string>
+    <string name="photo">Photo</string>
 </resources>

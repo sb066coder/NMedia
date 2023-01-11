@@ -17,6 +17,7 @@ import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.ViewUtils
 import ru.netology.nmedia.view.FeedFragment.Companion.numArg
+import ru.netology.nmedia.view.FeedFragment.Companion.textArg
 import ru.netology.nmedia.view.PostViewHolder.Companion.G_BASE_URL
 import ru.netology.nmedia.viewmodel.PostViewModel
 
@@ -101,13 +102,20 @@ class OpenPostFragment : Fragment() {
                     if (post.attachment != null) {
                         ivContent.visibility = View.VISIBLE
                         Glide.with(ivContent)
-                            .load("$G_BASE_URL/images/${post.attachment.url}")
+                            .load("$G_BASE_URL/media/${post.attachment.url}")
                             .timeout(10_000)
                             .placeholder(R.drawable.ic_baseline_image_24)
                             .error(R.drawable.ic_baseline_cancel_24)
                             .into(ivContent)
                     } else {
                         ivContent.visibility = View.GONE
+                    }
+
+                    ivContent.setOnClickListener {
+                        findNavController().navigate(
+                            R.id.action_openPostFragment_to_openPhotoFragment,
+                            Bundle().apply { textArg = "$G_BASE_URL/media/${post.attachment?.url}" }
+                        )
                     }
                 }
             }

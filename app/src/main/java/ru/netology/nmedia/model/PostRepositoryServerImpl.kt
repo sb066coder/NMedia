@@ -3,12 +3,16 @@ package ru.netology.nmedia.model
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nmedia.api.PostApi
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
 import ru.netology.nmedia.entity.toEntity
+import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.error.*
+import java.io.IOException
 
 class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
 
@@ -30,8 +34,6 @@ class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
         }
     }
 
-
-
     override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {
             delay(10_000L)
@@ -49,6 +51,39 @@ class PostRepositoryServerImpl(private val postDao: PostDao) : PostRepository {
 
     override fun getInvisibleAmount(): Int {
         return postDao.getInvisibleAmount()
+    }
+
+    override suspend fun saveWithAttachment(post: Post, uploadItem: MediaUpload) {
+        try {
+            val media = upload(uploadItem)
+            // TODO: add support for other types
+            val postWithAttachment = post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
+            save(postWithAttachment)
+        } catch (e: AppError) {
+            throw e
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun upload(uploadItem: MediaUpload): Media {
+        try {
+            val media = MultipartBody.Part.createFormData(
+                "file", uploadItem.file.name, uploadItem.file.asRequestBody()
+            )
+
+            val response = PostApi.service.upload(media)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            return response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
     }
 
     override suspend fun showNewPosts() {

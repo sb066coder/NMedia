@@ -70,6 +70,13 @@ class FeedFragment : Fragment() {
                         Bundle().apply { numArg = post.id }
                     )
                 }
+
+                override fun onOpenImage(imageUrl: String) {
+                    findNavController().navigate(
+                        R.id.action_feedFragment_to_openPhotoFragment,
+                        Bundle().apply { textArg = imageUrl }
+                    )
+                }
             }
         )
 
