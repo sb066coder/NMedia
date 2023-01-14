@@ -18,5 +18,8 @@
     <string name="fresh_posts">Новых постов</string>
     <string name="save">Сохранить</string>
     <string name="remove">Удалить</string>
-    <string name="photo">Photo</string>
+    <string name="photo">Фото</string>
+    <string name="sign_in">Вход</string>
+    <string name="sign_up">Регистрация</string>
+    <string name="sign_out">Выход</string>
 </resources>

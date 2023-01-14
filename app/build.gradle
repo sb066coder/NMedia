@@ -48,7 +48,6 @@ dependencies {
     def arch_version = "2.1.0"
     def nav_version = "2.5.3"
     def room_version = "2.4.3"
-    def imagepicker_version = "2.1"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.core:core-ktx:1.9.0'
@@ -76,10 +75,11 @@ dependencies {
     implementation "com.github.Dhaval2404:ImagePicker:v2.1"
     implementation "com.google.android.gms:play-services-base:18.1.0"
     implementation 'androidx.fragment:fragment-ktx:1.5.5'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
     testImplementation 'junit:junit:4.13.2'
     implementation "androidx.arch.core:core-testing:$arch_version"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
 }

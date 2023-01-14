@@ -9,6 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import retrofit2.http.*
 import ru.netology.nmedia.BuildConfig
+import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.dto.PushToken
 import ru.netology.nmedia.model.Media
 import ru.netology.nmedia.model.Post
 import java.util.concurrent.TimeUnit
@@ -16,16 +18,23 @@ import java.util.concurrent.TimeUnit
 
 const val BASE_URL = "${BuildConfig.BASE_URL}/api/"
 
+private val logging = HttpLoggingInterceptor().apply {
+    if (BuildConfig.DEBUG) {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+}
+
 private val client = OkHttpClient.Builder()
     .connectTimeout(30, TimeUnit.SECONDS)
-    .let {
-        if (BuildConfig.DEBUG) {
-            it.addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
-        } else {
-            it
+    .addInterceptor(logging)
+    .addInterceptor { chain ->
+        AppAuth.getInstance().authStateFlow.value.token?.let { token ->
+            val newRequest = chain.request().newBuilder()
+                .addHeader("Authorization", token)
+                .build()
+            return@addInterceptor chain.proceed(newRequest)
         }
+        chain.proceed(chain.request())
     }
     .build()
 
@@ -35,7 +44,10 @@ private val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
-interface PostApiService {
+interface ApiService {
+
+    @POST("users/push-tokens")
+    suspend fun save(@Body pushToken: PushToken): Response<Unit>
 
     @GET("posts")
     suspend fun getPosts(): Response<List<Post>>
@@ -60,8 +72,8 @@ interface PostApiService {
     suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
 }
 
-object PostApi {
-    val service: PostApiService by lazy {
+object Api {
+    val service: ApiService by lazy {
         retrofit.create()
     }
 }

@@ -30,9 +30,13 @@ class PostViewHolder(
             mbShare.text = ViewUtils.formattedNumber(post.shares)
             mbWatch.text = ViewUtils.formattedNumber(post.watches)
 
+            mbMenu.visibility = if (post.ownedByMe) View.VISIBLE else View.INVISIBLE
+
             mbMenu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
+                    // TODO: if we don't have other options, just remove dots
+                    menu.setGroupVisible(R.id.owner, post.ownedByMe)
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {

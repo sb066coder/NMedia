@@ -6,7 +6,9 @@ import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.*
 import ru.netology.nmedia.util.SingleLiveEvent
@@ -14,6 +16,7 @@ import java.io.File
 
 private val empty = Post(
     id = 0,
+    authorId = 0,
     author = "",
     authorAvatar = "",
     content = "",
@@ -30,14 +33,23 @@ enum class ErrorType {
 
 private val noPhoto = PhotoModel()
 
+@ExperimentalCoroutinesApi
 class PostViewModel(application: Application): AndroidViewModel(application) {
 
     private val repository: PostRepository =
         PostRepositoryServerImpl(AppDb.getInstance(application).postDao())
 
-    val data: LiveData<FeedModel> = repository.data
-        .map { FeedModel(it, it.isEmpty()) }
-        .asLiveData(Dispatchers.Default)
+    val data: LiveData<FeedModel> = AppAuth.getInstance()
+        .authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.data
+                .map { posts ->
+                    FeedModel(
+                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
+                        posts.isEmpty()
+                    )
+                }
+        }.asLiveData(Dispatchers.Default)
 
     private val _state = SingleLiveEvent<FeedModelState>()
     val state: LiveData<FeedModelState>
