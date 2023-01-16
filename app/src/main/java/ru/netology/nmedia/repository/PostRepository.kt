@@ -1,6 +1,9 @@
-package ru.netology.nmedia.model
+package ru.netology.nmedia.repository
 
 import kotlinx.coroutines.flow.Flow
+import ru.netology.nmedia.model.Media
+import ru.netology.nmedia.model.MediaUpload
+import ru.netology.nmedia.model.Post
 
 interface PostRepository {
     val data: Flow<List<Post>>
