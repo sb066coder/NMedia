@@ -9,9 +9,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.model.FeedModelState
@@ -20,6 +22,8 @@ import ru.netology.nmedia.util.LongArg
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 
+@OptIn(ExperimentalCoroutinesApi::class)
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
 
     companion object {
@@ -27,9 +31,7 @@ class FeedFragment : Fragment() {
         var Bundle.numArg: Long by LongArg
     }
 
-    val viewModel: PostViewModel by viewModels(
-        ownerProducer = ::requireParentFragment
-    )
+    val viewModel: PostViewModel by activityViewModels()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(

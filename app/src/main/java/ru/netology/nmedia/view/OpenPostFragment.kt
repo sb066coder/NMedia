@@ -8,28 +8,27 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentOpenPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.ViewUtils
 import ru.netology.nmedia.view.FeedFragment.Companion.numArg
-import ru.netology.nmedia.view.FeedFragment.Companion.textArg
 import ru.netology.nmedia.view.PostViewHolder.Companion.G_BASE_URL
 import ru.netology.nmedia.viewmodel.PostViewModel
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class OpenPostFragment : Fragment() {
 
     companion object {
         var Bundle.textArg: String? by StringArg
     }
 
-    private val viewModel: PostViewModel by viewModels(
-        ownerProducer = ::requireParentFragment
-    )
+    private val viewModel: PostViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
