@@ -10,10 +10,13 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.model.FeedModelState
@@ -67,9 +70,9 @@ class FeedFragment : Fragment() {
                 }
 
                 override fun onOpenPost(post: Post) {
+                    viewModel.postToOpen = post
                     findNavController().navigate(
-                        R.id.action_feedFragment_to_openPostFragment,
-                        Bundle().apply { numArg = post.id }
+                        R.id.action_feedFragment_to_openPostFragment
                     )
                 }
 
@@ -84,15 +87,35 @@ class FeedFragment : Fragment() {
 
         binding.rvList.adapter = adapter
 
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.posts) {
-                if (viewModel.onScroll) {
-                    binding.rvList.smoothScrollToPosition(0)
-                    viewModel.onScroll = false
-                }
+        lifecycleScope.launchWhenCreated {
+            viewModel.data.collectLatest {
+                adapter.submitData(it)
             }
-            binding.tvEmptyText.isVisible = state.empty
         }
+
+        viewModel.authChanged.observe(viewLifecycleOwner) {
+            viewModel.refreshData()
+        }
+
+        // FIXME: Сломалось при переходе на paging
+//        viewModel.data.observe(viewLifecycleOwner) { state ->
+//            adapter.submitList(state.posts) {
+//                if (viewModel.onScroll) {
+//                    binding.rvList.smoothScrollToPosition(0)
+//                    viewModel.onScroll = false
+//                }
+//            }
+//            binding.tvEmptyText.isVisible = state.empty
+//        }
+
+//        viewModel.postCreated.observe(viewLifecycleOwner) {
+//            adapter.submitList(viewModel.data.value?.posts)
+//        }
+
+//        viewModel.newerCount.observe(viewLifecycleOwner) {
+//            binding.chNewItems.text = ("$it ${getString(R.string.fresh_posts)}")
+//            binding.chNewItems.visibility = if (it > 0) View.VISIBLE else View.INVISIBLE
+//        }
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state is FeedModelState.Loading
@@ -109,8 +132,16 @@ class FeedFragment : Fragment() {
             }
         }
 
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest {
+                binding.swiper.isRefreshing = it.refresh is LoadState.Loading
+                        || it.append is LoadState.Loading
+                        || it.prepend is LoadState.Loading
+            }
+        }
+
         binding.swiper.setOnRefreshListener {
-            viewModel.refreshPosts()
+            adapter.refresh()
         }
 
         viewModel.isRefreshing.observe(viewLifecycleOwner) {
@@ -121,17 +152,8 @@ class FeedFragment : Fragment() {
             findNavController().navigate(R.id.action_feedFragment_to_editPostFragment)
         }
 
-        viewModel.postCreated.observe(viewLifecycleOwner) {
-            adapter.submitList(viewModel.data.value?.posts)
-        }
-
         viewModel.errorAppeared.observe(viewLifecycleOwner) {
             Toast.makeText(context, "Server error appeared", Toast.LENGTH_LONG).show()
-        }
-
-        viewModel.newerCount.observe(viewLifecycleOwner) {
-            binding.chNewItems.text = ("$it ${getString(R.string.fresh_posts)}")
-            binding.chNewItems.visibility = if (it > 0) View.VISIBLE else View.INVISIBLE
         }
 
         binding.chNewItems.setOnClickListener { chip ->

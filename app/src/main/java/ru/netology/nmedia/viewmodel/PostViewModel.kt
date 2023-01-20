@@ -1,15 +1,20 @@
 package ru.netology.nmedia.viewmodel
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.*
+import androidx.paging.PagingData
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.model.*
+import ru.netology.nmedia.model.FeedModelState
+import ru.netology.nmedia.model.MediaUpload
+import ru.netology.nmedia.model.PhotoModel
+import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.File
@@ -41,17 +46,19 @@ class PostViewModel @Inject constructor(
     appAuth: AppAuth
 ): ViewModel() {
 
-    val data: LiveData<FeedModel> = appAuth
+    var postToOpen: Post? = null
+
+    val data: Flow<PagingData<Post>> = appAuth
         .authStateFlow
         .flatMapLatest { (myId, _) ->
-            repository.data
+            repository
+                .data
                 .map { posts ->
-                    FeedModel(
-                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
-                        posts.isEmpty()
-                    )
+                        posts.map { it.copy(ownedByMe = it.authorId == myId) }
                 }
-        }.asLiveData(Dispatchers.Default)
+        }.flowOn(Dispatchers.Default)
+
+     val authChanged = appAuth.authStateFlow.asLiveData()
 
     private val _state = SingleLiveEvent<FeedModelState>()
     val state: LiveData<FeedModelState>
@@ -116,14 +123,15 @@ class PostViewModel @Inject constructor(
         edited.value = post
     }
 
-    val newerCount: LiveData<Int> = data.switchMap {
-        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
-            .catch {
-                Log.e("Error", "Network error")
-                MutableLiveData(repository.getInvisibleAmount())
-            }
-            .asLiveData(Dispatchers.Default)
-    }
+    // FIXME: Сломалось при переходе на paging
+//    val newerCount: LiveData<Int> = data. {
+//        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
+//            .catch {
+//                Log.e("Error", "Network error")
+//                MutableLiveData(repository.getInvisibleAmount())
+//            }
+//            .asLiveData(Dispatchers.Default)
+//    }
 
     fun showNewPosts() = viewModelScope.launch {
         onScroll = true
@@ -185,5 +193,9 @@ class PostViewModel @Inject constructor(
 
     fun changePhoto(uri: Uri?, file: File?) {
         _photo.value = PhotoModel(uri, file)
+    }
+
+    fun refreshData() {
+        repository.refreshData()
     }
 }
