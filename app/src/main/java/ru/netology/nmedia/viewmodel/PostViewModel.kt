@@ -3,13 +3,11 @@ package ru.netology.nmedia.viewmodel
 import android.net.Uri
 import androidx.lifecycle.*
 import androidx.paging.PagingData
-import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.MediaUpload
@@ -50,15 +48,9 @@ class PostViewModel @Inject constructor(
 
     val data: Flow<PagingData<Post>> = appAuth
         .authStateFlow
-        .flatMapLatest { (myId, _) ->
-            repository
-                .data
-                .map { posts ->
-                        posts.map { it.copy(ownedByMe = it.authorId == myId) }
-                }
-        }.flowOn(Dispatchers.Default)
+        .flatMapLatest { repository.data }.flowOn(Dispatchers.Default)
 
-     val authChanged = appAuth.authStateFlow.asLiveData()
+    val authChanged = appAuth.authStateFlow.asLiveData()
 
     private val _state = SingleLiveEvent<FeedModelState>()
     val state: LiveData<FeedModelState>
@@ -78,7 +70,7 @@ class PostViewModel @Inject constructor(
 
     private val scope = MainScope()
 
-    var onScroll = false
+    private var onScroll = false
 
     private lateinit var lastFailArgs: Pair<ErrorType, Any>
 
@@ -195,7 +187,4 @@ class PostViewModel @Inject constructor(
         _photo.value = PhotoModel(uri, file)
     }
 
-    fun refreshData() {
-        repository.refreshData()
-    }
 }

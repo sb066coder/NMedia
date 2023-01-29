@@ -17,6 +17,5 @@ interface PostRepository {
     fun getInvisibleAmount(): Int
     suspend fun saveWithAttachment(post: Post, uploadItem: MediaUpload)
     suspend fun upload(uploadItem: MediaUpload): Media
-    fun refreshData()
 
 }
