@@ -2,14 +2,13 @@ package ru.netology.nmedia.view
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
+import androidx.paging.PagingDataAdapter
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.model.Post
 
-// Адаптер необходим для работы ресайклера т.к. содержит необходимые функции
 class PostsAdapter(
     private val onInteractionListener: OnInteractionListener
-    ) : ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
+    ) : PagingDataAdapter<Post, PostViewHolder>(PostDiffCallback()) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -18,7 +17,7 @@ class PostsAdapter(
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = getItem(position)
+        val post = getItem(position) ?: return
         holder.bind(post)
     }
 
@@ -31,7 +30,7 @@ class PostsAdapter(
             super.onBindViewHolder(holder, position, payloads)
         } else {
             if (payloads[0] == true) {
-                holder.bindOnLikeChanged(getItem(position))
+                holder.bindOnLikeChanged(getItem(position)!!)
             }
         }
     }

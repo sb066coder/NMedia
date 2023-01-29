@@ -1,12 +1,13 @@
 package ru.netology.nmedia.repository
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import ru.netology.nmedia.model.Media
 import ru.netology.nmedia.model.MediaUpload
 import ru.netology.nmedia.model.Post
 
 interface PostRepository {
-    val data: Flow<List<Post>>
+    val data: Flow<PagingData<Post>>
     suspend fun getAll(): List<Post>
     suspend fun likeById(plusLike: Boolean, id: Long)
     suspend fun deleteById(id: Long)
@@ -16,5 +17,6 @@ interface PostRepository {
     fun getInvisibleAmount(): Int
     suspend fun saveWithAttachment(post: Post, uploadItem: MediaUpload)
     suspend fun upload(uploadItem: MediaUpload): Media
+    fun refreshData()
 
 }

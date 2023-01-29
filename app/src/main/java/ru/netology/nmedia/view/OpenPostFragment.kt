@@ -17,7 +17,6 @@ import ru.netology.nmedia.databinding.FragmentOpenPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.ViewUtils
-import ru.netology.nmedia.view.FeedFragment.Companion.numArg
 import ru.netology.nmedia.view.PostViewHolder.Companion.G_BASE_URL
 import ru.netology.nmedia.viewmodel.PostViewModel
 
@@ -40,83 +39,78 @@ class OpenPostFragment : Fragment() {
             false
         )
 
-        viewModel.data.observe(viewLifecycleOwner) {
-            val post: Post? = viewModel.data.value!!.posts.firstOrNull { it.id == arguments?.numArg }
-            if (post == null) {
-                findNavController().popBackStack()
-            } else {
 
-                binding.apply {
-                    tvAuthor.text = post.author
-                    tvPublished.text = post.published
-                    tvContent.text = post.content
-                    mbLike.isChecked = post.likedByMe
-                    mbLike.text = ViewUtils.formattedNumber(post.likes)
-                    mbShare.text = ViewUtils.formattedNumber(post.shares)
-                    mbWatch.text = ViewUtils.formattedNumber(post.watches)
-                    mbLike.setOnClickListener { viewModel.likeById(!post.likedByMe, post.id) }
-                    mbShare.setOnClickListener {
-                        val intent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, post.content)
-                            type = "text/plain"
-                        }
-                        val shareIntent =
-                            Intent.createChooser(intent, getString(R.string.chooser_share_post))
-                        startActivity(shareIntent)
-                    }
-
-                    mbMenu.setOnClickListener {
-                        PopupMenu(it.context, it).apply {
-                            inflate(R.menu.options_post)
-                            setOnMenuItemClickListener { item ->
-                                when (item.itemId) {
-                                    R.id.remove -> {
-                                        viewModel.deleteById(post.id)
-                                        true
-                                    }
-                                    R.id.edit -> {
-                                        viewModel.edit(post)
-                                        findNavController().navigate(
-                                            R.id.action_openPostFragment_to_editPostFragment,
-                                            Bundle().apply { textArg = post.content }
-                                        )
-                                        true
-                                    }
-                                    else -> false
-                                }
-                            }
-                        }.show()
-                    }
-
-                    val url = "${G_BASE_URL}/avatars/${post.authorAvatar}"
-                    Glide.with(ivAvatar)
-                        .load(url)
-                        .timeout(10_000)
-                        .placeholder(R.drawable.ic_baseline_image_24)
-                        .error(R.drawable.ic_baseline_cancel_24)
-                        .circleCrop()
-                        .into(ivAvatar)
-
-                    if (post.attachment != null) {
-                        ivContent.visibility = View.VISIBLE
-                        Glide.with(ivContent)
-                            .load("$G_BASE_URL/media/${post.attachment.url}")
-                            .timeout(10_000)
-                            .placeholder(R.drawable.ic_baseline_image_24)
-                            .error(R.drawable.ic_baseline_cancel_24)
-                            .into(ivContent)
-                    } else {
-                        ivContent.visibility = View.GONE
-                    }
-
-                    ivContent.setOnClickListener {
-                        findNavController().navigate(
-                            R.id.action_openPostFragment_to_openPhotoFragment,
-                            Bundle().apply { textArg = "$G_BASE_URL/media/${post.attachment?.url}" }
-                        )
-                    }
+        val post: Post = viewModel.postToOpen ?: throw RuntimeException()
+        viewModel.postToOpen = null
+        binding.apply {
+            tvAuthor.text = post.author
+            tvPublished.text = post.published
+            tvContent.text = post.content
+            mbLike.isChecked = post.likedByMe
+            mbLike.text = ViewUtils.formattedNumber(post.likes)
+            mbShare.text = ViewUtils.formattedNumber(post.shares)
+            mbWatch.text = ViewUtils.formattedNumber(post.watches)
+            mbLike.setOnClickListener { viewModel.likeById(!post.likedByMe, post.id) }
+            mbShare.setOnClickListener {
+                val intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, post.content)
+                    type = "text/plain"
                 }
+                val shareIntent =
+                    Intent.createChooser(intent, getString(R.string.chooser_share_post))
+                startActivity(shareIntent)
+            }
+
+            mbMenu.setOnClickListener {
+                PopupMenu(it.context, it).apply {
+                    inflate(R.menu.options_post)
+                    setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.remove -> {
+                                viewModel.deleteById(post.id)
+                                true
+                            }
+                            R.id.edit -> {
+                                viewModel.edit(post)
+                                findNavController().navigate(
+                                    R.id.action_openPostFragment_to_editPostFragment,
+                                    Bundle().apply { textArg = post.content }
+                                )
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                }.show()
+            }
+
+            val url = "${G_BASE_URL}/avatars/${post.authorAvatar}"
+            Glide.with(ivAvatar)
+                .load(url)
+                .timeout(10_000)
+                .placeholder(R.drawable.ic_baseline_image_24)
+                .error(R.drawable.ic_baseline_cancel_24)
+                .circleCrop()
+                .into(ivAvatar)
+
+            if (post.attachment != null) {
+                ivContent.visibility = View.VISIBLE
+                Glide.with(ivContent)
+                    .load("$G_BASE_URL/media/${post.attachment.url}")
+                    .timeout(10_000)
+                    .placeholder(R.drawable.ic_baseline_image_24)
+                    .error(R.drawable.ic_baseline_cancel_24)
+                    .into(ivContent)
+            } else {
+                ivContent.visibility = View.GONE
+            }
+
+            ivContent.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_openPostFragment_to_openPhotoFragment,
+                    Bundle().apply { textArg = "$G_BASE_URL/media/${post.attachment?.url}" }
+                )
             }
         }
 
