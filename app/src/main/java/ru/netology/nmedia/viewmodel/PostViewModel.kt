@@ -81,7 +81,6 @@ class PostViewModel @Inject constructor(
     private fun loadPosts(onRefresh: Boolean = false) = viewModelScope.launch {
         try {
             _state.value = if (onRefresh) FeedModelState.Refreshing else FeedModelState.Loading
-            repository.getAll()
             _state.value = FeedModelState.Idle
         } catch (e: Exception) {
             lastFailArgs = ErrorType.LOAD to Any()
