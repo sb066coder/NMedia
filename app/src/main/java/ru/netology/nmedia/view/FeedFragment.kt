@@ -92,11 +92,12 @@ class FeedFragment : Fragment() {
                 adapter.submitData(it)
             }
         }
-
+/*
+проверка на работоспособность без обновления при log in/out
         viewModel.authChanged.observe(viewLifecycleOwner) {
             viewModel.refreshData()
         }
-
+*/
         // FIXME: Сломалось при переходе на paging
 //        viewModel.data.observe(viewLifecycleOwner) { state ->
 //            adapter.submitList(state.posts) {

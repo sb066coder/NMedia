@@ -41,7 +41,6 @@ class OpenPostFragment : Fragment() {
 
 
         val post: Post = viewModel.postToOpen ?: throw RuntimeException()
-        viewModel.postToOpen = null
         binding.apply {
             tvAuthor.text = post.author
             tvPublished.text = post.published
