@@ -21,14 +21,21 @@ class PostRemoteMediator(
 
     override suspend fun load(loadType: LoadType, state: PagingState<Int, PostEntity>): MediatorResult {
         try {
+            val id: Long?
             val result = when (loadType) {
-                LoadType.REFRESH -> apiService.getLatest(state.config.initialLoadSize)
+                LoadType.REFRESH -> {
+                    id = postRemoteKeyDao.max()
+                    if (id == null) {
+                        apiService.getLatest(state.config.initialLoadSize)
+                    } else {
+                        apiService.getAfter(id, state.config.pageSize)
+                    }
+                }
                 LoadType.PREPEND -> {
-                    /*val id = postRemoteKeyDao.max() ?: */return MediatorResult.Success(true)
-                    //apiService.getAfter(id, state.config.pageSize)
+                    return MediatorResult.Success(true)
                 }
                 LoadType.APPEND -> {
-                    val id = postRemoteKeyDao.min() ?: return MediatorResult.Success(false)
+                    id = postRemoteKeyDao.min() ?: return MediatorResult.Success(false)
                     apiService.getBefore(id, state.config.pageSize)
                 }
             }
@@ -42,29 +49,20 @@ class PostRemoteMediator(
             appDb.withTransaction {
                 when (loadType) {
                     LoadType.REFRESH -> {
-                        postRemoteKeyDao.clear()
                         postRemoteKeyDao.insert(
-                            listOf(
-                                PostRemoteKeyEntity(
-                                    PostRemoteKeyEntity.KeyType.AFTER,
-                                    body.firstOrNull()?.id,
-                                ),
-                                PostRemoteKeyEntity(
-                                    PostRemoteKeyEntity.KeyType.BEFORE,
-                                    body.lastOrNull()?.id,
-                                )
+                            PostRemoteKeyEntity(
+                                PostRemoteKeyEntity.KeyType.AFTER,
+                                body.firstOrNull()?.id
                             )
                         )
-//                        postDao.clear()
+                        if (id == null)
+                            postRemoteKeyDao.insert(
+                                PostRemoteKeyEntity(
+                                    PostRemoteKeyEntity.KeyType.BEFORE,
+                                    body.lastOrNull()?.id
+                                )
+                            )
                     }
-//                    LoadType.PREPEND -> {
-//                        postRemoteKeyDao.insert(
-//                            PostRemoteKeyEntity(
-//                                PostRemoteKeyEntity.KeyType.AFTER,
-//                                body.firstOrNull()?.id,
-//                            )
-//                        )
-//                    }
                     LoadType.APPEND -> {
                         postRemoteKeyDao.insert(
                             PostRemoteKeyEntity(
