@@ -3,20 +3,23 @@ package ru.netology.nmedia.viewmodel
 import android.net.Uri
 import androidx.lifecycle.*
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.model.FeedModelState
-import ru.netology.nmedia.model.MediaUpload
-import ru.netology.nmedia.model.PhotoModel
-import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.model.*
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.File
 import javax.inject.Inject
+import kotlin.random.Random
 
 private val empty = Post(
     id = 0,
@@ -46,9 +49,23 @@ class PostViewModel @Inject constructor(
 
     var postToOpen: Post? = null
 
-    val data: Flow<PagingData<Post>> = appAuth
+    private val cached: Flow<PagingData<FeedItem>> = repository
+        .data
+        .map { pagingData ->
+            pagingData.insertSeparators(
+                generator = { before, _ ->
+                    if (before?.id?.rem(5) != 0L) null else
+                        Ad(
+                            Random.nextLong(),
+                            "figma.jpg"
+                        )
+                }
+            )
+        }.cachedIn(viewModelScope)
+
+    val data: Flow<PagingData<FeedItem>> = appAuth
         .authStateFlow
-        .flatMapLatest { repository.data }.flowOn(Dispatchers.Default)
+        .flatMapLatest { cached }
 
     val authChanged = appAuth.authStateFlow.asLiveData()
 

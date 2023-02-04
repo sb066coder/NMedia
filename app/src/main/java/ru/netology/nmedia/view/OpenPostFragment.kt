@@ -10,14 +10,13 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentOpenPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.ViewUtils
-import ru.netology.nmedia.view.PostViewHolder.Companion.G_BASE_URL
+import ru.netology.nmedia.adapter.PostViewHolder.Companion.G_BASE_URL
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -86,22 +85,11 @@ class OpenPostFragment : Fragment() {
             }
 
             val url = "${G_BASE_URL}/avatars/${post.authorAvatar}"
-            Glide.with(ivAvatar)
-                .load(url)
-                .timeout(10_000)
-                .placeholder(R.drawable.ic_baseline_image_24)
-                .error(R.drawable.ic_baseline_cancel_24)
-                .circleCrop()
-                .into(ivAvatar)
+            ivAvatar.loadCircleCrop(url)
 
             if (post.attachment != null) {
                 ivContent.visibility = View.VISIBLE
-                Glide.with(ivContent)
-                    .load("$G_BASE_URL/media/${post.attachment.url}")
-                    .timeout(10_000)
-                    .placeholder(R.drawable.ic_baseline_image_24)
-                    .error(R.drawable.ic_baseline_cancel_24)
-                    .into(ivContent)
+                ivContent.load("$G_BASE_URL/media/${post.attachment.url}")
             } else {
                 ivContent.visibility = View.GONE
             }

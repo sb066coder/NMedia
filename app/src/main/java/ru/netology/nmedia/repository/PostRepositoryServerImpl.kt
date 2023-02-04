@@ -17,10 +17,7 @@ import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
-import ru.netology.nmedia.model.Attachment
-import ru.netology.nmedia.model.Media
-import ru.netology.nmedia.model.MediaUpload
-import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.model.*
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,8 +40,7 @@ class PostRepositoryServerImpl @Inject constructor(
             postRemoteKeyDao = postRemoteKeyDao,
             appDb = appDb
         )
-    ).flow
-        .map { it.map(PostEntity::toDto) }
+    ).flow.map { it.map(PostEntity::toDto) }
 
 
     override suspend fun getAll(): List<Post> {
