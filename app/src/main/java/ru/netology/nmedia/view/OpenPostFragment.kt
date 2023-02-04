@@ -12,11 +12,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.R
+import ru.netology.nmedia.adapter.PostViewHolder.Companion.G_BASE_URL
 import ru.netology.nmedia.databinding.FragmentOpenPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.ViewUtils
-import ru.netology.nmedia.adapter.PostViewHolder.Companion.G_BASE_URL
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -40,7 +40,7 @@ class OpenPostFragment : Fragment() {
 
 
         val post: Post = viewModel.postToOpen ?: throw RuntimeException()
-        viewModel.postToOpen = null
+//        viewModel.postToOpen = null
         binding.apply {
             tvAuthor.text = post.author
             tvPublished.text = post.published
