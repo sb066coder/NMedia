@@ -29,4 +29,7 @@
     <string name="sign_up">Sign Up</string>
     <string name="sign_out">Sign out</string>
     <string name="retry_load">Retry</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="lastWeek">Last week</string>
 </resources>

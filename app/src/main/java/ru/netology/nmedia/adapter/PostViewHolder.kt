@@ -23,7 +23,7 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             tvAuthor.text = post.author
-            tvPublished.text = post.published
+            tvPublished.text = post.published.toString()
             tvContent.text = post.content
             mbLike.isChecked = post.likedByMe
             mbLike.setOnClickListener { onInteractionListener.onLike(post) }

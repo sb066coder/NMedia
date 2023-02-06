@@ -43,7 +43,7 @@ class OpenPostFragment : Fragment() {
 //        viewModel.postToOpen = null
         binding.apply {
             tvAuthor.text = post.author
-            tvPublished.text = post.published
+            tvPublished.text = post.published.toString()
             tvContent.text = post.content
             mbLike.isChecked = post.likedByMe
             mbLike.text = ViewUtils.formattedNumber(post.likes)

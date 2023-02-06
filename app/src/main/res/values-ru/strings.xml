@@ -23,4 +23,7 @@
     <string name="sign_up">Регистрация</string>
     <string name="sign_out">Выход</string>
     <string name="retry_load">Повторить</string>
+    <string name="today">Сегодня</string>
+    <string name="yesterday">Вчера</string>
+    <string name="lastWeek">На прошлой неделе</string>
 </resources>

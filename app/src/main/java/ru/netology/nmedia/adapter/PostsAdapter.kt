@@ -7,9 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardAdBinding
 import ru.netology.nmedia.databinding.CardPostBinding
+import ru.netology.nmedia.databinding.CardTimingSeparatorBinding
 import ru.netology.nmedia.model.Ad
 import ru.netology.nmedia.model.FeedItem
 import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.model.TimingSeparator
 import ru.netology.nmedia.view.OnInteractionListener
 
 class PostsAdapter(
@@ -20,6 +22,7 @@ class PostsAdapter(
         when (getItem(position)) {
             is Ad -> R.layout.card_ad
             is Post -> R.layout.card_post
+            is TimingSeparator -> R.layout.card_timing_separator
             null -> error("unknown item type")
         }
 
@@ -33,6 +36,10 @@ class PostsAdapter(
                 val binding = CardAdBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 AdViewHolder(binding)
             }
+            R.layout.card_timing_separator -> {
+                val binding = CardTimingSeparatorBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                TimingSeparatorViewHolder(binding)
+            }
             else -> error("unknown view type: $viewType")
         }
 
@@ -41,6 +48,7 @@ class PostsAdapter(
         when (val item = getItem(position)) {
             is Ad -> (holder as? AdViewHolder)?.bind(item)
             is Post -> (holder as? PostViewHolder)?.bind(item)
+            is TimingSeparator -> (holder as? TimingSeparatorViewHolder)?.bind(item)
             null -> error("unknown item type")
         }
     }

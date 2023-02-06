@@ -1,6 +1,8 @@
 package ru.netology.nmedia.viewmodel
 
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -27,7 +29,7 @@ private val empty = Post(
     author = "",
     authorAvatar = "",
     content = "",
-    published = "",
+    published = 0,
     likes = 0,
     shares = 0,
     watches = 0,
@@ -49,20 +51,35 @@ class PostViewModel @Inject constructor(
 
     var postToOpen: Post? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private val cached: Flow<PagingData<FeedItem>> = repository
         .data
         .map { pagingData ->
-            pagingData.insertSeparators(
-                generator = { before, _ ->
-                    if (before?.id?.rem(5) != 0L) null else
-                        Ad(
-                            Random.nextLong(),
-                            "figma.jpg"
-                        )
-                }
-            )
+            pagingData.insertSeparators { before, after ->
+                if (after == null) {
+                    null
+                } else if (
+                    before == null
+                    || after.ageDays() - before.ageDays() in 1..2
+                ) {
+                    TimingSeparator(
+                        Random.nextLong(),
+                        when (after.ageDays()) {
+                            0L -> TimingSeparator.Period.TODAY
+                            1L -> TimingSeparator.Period.YESTERDAY
+                            else -> TimingSeparator.Period.LAST_WEEK
+                        }
+                    )
+                } else if (before.id.rem(5) == 0L) {
+                    Ad(
+                        Random.nextLong(),
+                        "figma.jpg"
+                    )
+                } else null
+            }
         }.cachedIn(viewModelScope)
 
+    @RequiresApi(Build.VERSION_CODES.O)
     val data: Flow<PagingData<FeedItem>> = appAuth
         .authStateFlow
         .flatMapLatest { cached }
