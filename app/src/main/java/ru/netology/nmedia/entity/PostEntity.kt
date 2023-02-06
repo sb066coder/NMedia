@@ -16,12 +16,13 @@ data class PostEntity(
     val author: String,
     val authorAvatar:String,
     val content: String,
-    val published: String,
+    val published: Long,
     val likes: Int,
     val likedByMe: Boolean = false,
     val shown: Boolean = true,
     @Embedded
-    var attachment: AttachmentEmbeddable? = null
+    var attachment: AttachmentEmbeddable? = null,
+    val ownedByMe: Boolean
 ) {
     fun toDto() = Post(
         id,
@@ -34,7 +35,8 @@ data class PostEntity(
         0,
         0,
         likedByMe,
-        attachment = attachment?.toDto()
+        attachment = attachment?.toDto(),
+        ownedByMe = ownedByMe
     )
     fun hide() = this.copy(shown = false)
 
@@ -48,7 +50,8 @@ data class PostEntity(
             dto.published,
             dto.likes,
             dto.likedByMe,
-            attachment = AttachmentEmbeddable.fromDto(dto.attachment)
+            attachment = AttachmentEmbeddable.fromDto(dto.attachment),
+            ownedByMe = dto.ownedByMe
         )
     }
 
