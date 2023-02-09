@@ -1,5 +1,7 @@
 package ru.netology.nmedia.adapter
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
@@ -73,12 +75,24 @@ class PostViewHolder(
         }
     }
 
-    fun bindOnLikeChanged(post: Post) {
-        with(binding.mbLike) {
-            isChecked = post.likedByMe
-            text = ViewUtils.formattedNumber(post.likes)
-            setOnClickListener { onInteractionListener.onLike(post) }
+    fun bind(payload: Payload) {
+        payload.likedByMe?.also {
+            binding.mbLike.isChecked = it
+            if (it) {
+                ObjectAnimator.ofPropertyValuesHolder(
+                    binding.mbLike,
+                    PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0F, 1.2F, 1.0F),
+                    PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0F, 1.2F, 1.0F)
+                )
+            } else {
+                ObjectAnimator.ofFloat(binding.mbLike, View.ROTATION, 0F, 360F)
+            }.start()
         }
-
+        payload.likes?.also {
+            binding.mbLike.text = it.toString()
+        }
+        payload.content?.also {
+            binding.tvContent.text = it
+        }
     }
 }

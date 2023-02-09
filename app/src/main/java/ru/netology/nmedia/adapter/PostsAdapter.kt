@@ -44,7 +44,10 @@ class PostsAdapter(
         }
 
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int
+    ) {
         when (val item = getItem(position)) {
             is Ad -> (holder as? AdViewHolder)?.bind(item)
             is Post -> (holder as? PostViewHolder)?.bind(item)
@@ -56,14 +59,45 @@ class PostsAdapter(
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
-        payloads: MutableList<Any>
+        payloads: List<Any>
     ) {
         if (payloads.isEmpty()) {
-            super.onBindViewHolder(holder, position, payloads)
+            onBindViewHolder(holder, position)
         } else {
-            if (payloads[0] == true) {
-                (holder as PostViewHolder).bindOnLikeChanged(getItem(position)!! as Post)
+            payloads.forEach {
+                (it as? Payload)?.let { payloads ->
+                    (holder as PostViewHolder).bind(payloads)
+                }
             }
         }
     }
 }
+
+data class Payload(
+    val likedByMe: Boolean? = null,
+    val likes: Int? = null,
+    val content: String? = null,
+
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
