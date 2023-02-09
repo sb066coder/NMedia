@@ -1,13 +1,17 @@
-package ru.netology.nmedia.view
+package ru.netology.nmedia.adapter
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.util.ViewUtils
+import ru.netology.nmedia.view.OnInteractionListener
+import ru.netology.nmedia.view.load
+import ru.netology.nmedia.view.loadCircleCrop
 
 class PostViewHolder(
     private val binding: CardPostBinding,
@@ -21,7 +25,7 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             tvAuthor.text = post.author
-            tvPublished.text = post.published
+            tvPublished.text = post.published.toString()
             tvContent.text = post.content
             mbLike.isChecked = post.likedByMe
             mbLike.setOnClickListener { onInteractionListener.onLike(post) }
@@ -54,22 +58,11 @@ class PostViewHolder(
             }
 
             val url = "$G_BASE_URL/avatars/${post.authorAvatar}"
-            Glide.with(ivAvatar)
-                .load(url)
-                .timeout(10_000)
-                .placeholder(R.drawable.ic_baseline_image_24)
-                .error(R.drawable.ic_baseline_cancel_24)
-                .circleCrop()
-                .into(ivAvatar)
+            ivAvatar.loadCircleCrop(url)
 
             if (post.attachment != null) {
                 ivContent.visibility = View.VISIBLE
-                Glide.with(ivContent)
-                    .load("$G_BASE_URL/media/${post.attachment.url}")
-                    .timeout(10_000)
-                    .placeholder(R.drawable.ic_baseline_image_24)
-                    .error(R.drawable.ic_baseline_cancel_24)
-                    .into(ivContent)
+                ivContent.load("$G_BASE_URL/media/${post.attachment.url}")
             } else {
                 ivContent.visibility = View.GONE
             }
@@ -82,12 +75,24 @@ class PostViewHolder(
         }
     }
 
-    fun bindOnLikeChanged(post: Post) {
-        with(binding.mbLike) {
-            isChecked = post.likedByMe
-            text = ViewUtils.formattedNumber(post.likes)
-            setOnClickListener { onInteractionListener.onLike(post) }
+    fun bind(payload: Payload) {
+        payload.likedByMe?.also {
+            binding.mbLike.isChecked = it
+            if (it) {
+                ObjectAnimator.ofPropertyValuesHolder(
+                    binding.mbLike,
+                    PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0F, 1.2F, 1.0F),
+                    PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0F, 1.2F, 1.0F)
+                )
+            } else {
+                ObjectAnimator.ofFloat(binding.mbLike, View.ROTATION, 0F, 360F)
+            }.start()
         }
-
+        payload.likes?.also {
+            binding.mbLike.text = it.toString()
+        }
+        payload.content?.also {
+            binding.tvContent.text = it
+        }
     }
 }

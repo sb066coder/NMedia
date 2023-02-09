@@ -1,24 +1,27 @@
 package ru.netology.nmedia.viewmodel
 
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import androidx.paging.PagingData
-import androidx.paging.map
+import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.model.FeedModelState
-import ru.netology.nmedia.model.MediaUpload
-import ru.netology.nmedia.model.PhotoModel
-import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.model.*
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.File
 import javax.inject.Inject
+import kotlin.random.Random
 
 private val empty = Post(
     id = 0,
@@ -26,7 +29,7 @@ private val empty = Post(
     author = "",
     authorAvatar = "",
     content = "",
-    published = "",
+    published = 0,
     likes = 0,
     shares = 0,
     watches = 0,
@@ -48,17 +51,40 @@ class PostViewModel @Inject constructor(
 
     var postToOpen: Post? = null
 
-    val data: Flow<PagingData<Post>> = appAuth
-        .authStateFlow
-        .flatMapLatest { (myId, _) ->
-            repository
-                .data
-                .map { posts ->
-                        posts.map { it.copy(ownedByMe = it.authorId == myId) }
-                }
-        }.flowOn(Dispatchers.Default)
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val cached: Flow<PagingData<FeedItem>> = repository
+        .data
+        .map { pagingData ->
+            pagingData.insertSeparators { before, after ->
+                if (after == null) {
+                    null
+                } else if (
+                    before == null
+                    || after.ageDays() - before.ageDays() in 1..2
+                ) {
+                    TimingSeparator(
+                        Random.nextLong(),
+                        when (after.ageDays()) {
+                            0L -> TimingSeparator.Period.TODAY
+                            1L -> TimingSeparator.Period.YESTERDAY
+                            else -> TimingSeparator.Period.LAST_WEEK
+                        }
+                    )
+                } else if (before.id.rem(5) == 0L) {
+                    Ad(
+                        Random.nextLong(),
+                        "figma.jpg"
+                    )
+                } else null
+            }
+        }.cachedIn(viewModelScope)
 
-     val authChanged = appAuth.authStateFlow.asLiveData()
+    @RequiresApi(Build.VERSION_CODES.O)
+    val data: Flow<PagingData<FeedItem>> = appAuth
+        .authStateFlow
+        .flatMapLatest { cached }
+
+    val authChanged = appAuth.authStateFlow.asLiveData()
 
     private val _state = SingleLiveEvent<FeedModelState>()
     val state: LiveData<FeedModelState>
@@ -78,7 +104,7 @@ class PostViewModel @Inject constructor(
 
     private val scope = MainScope()
 
-    var onScroll = false
+    private var onScroll = false
 
     private lateinit var lastFailArgs: Pair<ErrorType, Any>
 
@@ -89,7 +115,7 @@ class PostViewModel @Inject constructor(
     private fun loadPosts(onRefresh: Boolean = false) = viewModelScope.launch {
         try {
             _state.value = if (onRefresh) FeedModelState.Refreshing else FeedModelState.Loading
-            repository.getAll()
+            // repository.getAll()
             _state.value = FeedModelState.Idle
         } catch (e: Exception) {
             lastFailArgs = ErrorType.LOAD to Any()
@@ -195,7 +221,4 @@ class PostViewModel @Inject constructor(
         _photo.value = PhotoModel(uri, file)
     }
 
-    fun refreshData() {
-        repository.refreshData()
-    }
 }
